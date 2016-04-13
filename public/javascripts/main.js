@@ -400,12 +400,12 @@ function Container() {
 			if (strip(guess) === strip(currentSong.title)) {
 				score += 1;
 				$('#score').html("Score: "+score);
-				$('#'+currentSong.title.hashCode()).html(currentSong.title);
+				$('#'+currentSong.title.hashCode()).html("<i class='fa fa-check-circle'></i> "+currentSong.title);
 				$('#'+currentSong.title.hashCode()).css('background', '#00eb34');
 				nextsong();
 			}
 			else {
-				$('#'+currentSong.title.hashCode()).html(currentSong.title);
+				$('#'+currentSong.title.hashCode()).html("<i class='fa fa-times-circle'></i> "+currentSong.title);
 				$('#'+currentSong.title.hashCode()).css('background', '#fe2c3b');
 				nextsong();
 			}
