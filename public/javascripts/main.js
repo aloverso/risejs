@@ -200,54 +200,58 @@ function Container() {
 					canplay[counter].currentTime = currentSong.startTime;
 				}
 			}
-			// first time
-			//**********************
-			if ((start || notplaying) && songs.length > 1) {
 
-				if (start) {
-					console.log("FUCK");
-					for (var i=0; i<numsongs; i++) {
-						var audioElement = document.createElement('audio');
-						audioElement.setAttribute('src', songs[i].path);
-						audioElement.currentTime = songs[i].startTime;
-						audioElement.load();
-						audioElement.setAttribute('id',songs[i].title)
-						audioElement.preload = "auto";
-						audioElement.oncanplaythrough = function() {
-							if (canplay.indexOf(this) < 0) {
-								canplay.push(this);
-								t = this.getAttribute('id');
-								console.log(t);
-								for (var j=0; j<numsongs; j++) {
-									if (songs[j].title === t) {
-										songsplay.push(songs[j]);
-										break;
+			try {
+				// first time
+				//**********************
+				if ((start || notplaying) && songs.length > 1) {
+
+					if (start) {
+						console.log("FUCK");
+						for (var i=0; i<numsongs; i++) {
+							var audioElement = document.createElement('audio');
+							audioElement.setAttribute('src', songs[i].path);
+							audioElement.currentTime = songs[i].startTime;
+							audioElement.load();
+							audioElement.setAttribute('id',songs[i].title)
+							audioElement.preload = "auto";
+							audioElement.oncanplaythrough = function() {
+								if (canplay.indexOf(this) < 0) {
+									canplay.push(this);
+									t = this.getAttribute('id');
+									console.log(t);
+									for (var j=0; j<numsongs; j++) {
+										if (songs[j].title === t) {
+											songsplay.push(songs[j]);
+											break;
+										}
 									}
-								}
-								$('#loading').remove();
-								$('#status').append("<div class='status-box clickable' id='"+t.hashCode()+"' onclick='c.jumpsong("+(canplay.indexOf(this))+")'>"+(canplay.indexOf(this)+1)+"</div>");
-								if (canplay.length < numsongs) {
-									$('#status').append("<div id='loading'>LOADING...</div>");
-								}
+									$('#loading').remove();
+									$('#status').append("<div class='status-box clickable' id='"+t.hashCode()+"' onclick='c.jumpsong("+(canplay.indexOf(this))+")'>"+(canplay.indexOf(this)+1)+"</div>");
+									if (canplay.length < numsongs) {
+										$('#status').append("<div id='loading'>LOADING...</div>");
+									}
 
+								}
 							}
+							loads.push(audioElement);
 						}
-						loads.push(audioElement);
+						start = false;
 					}
-					start = false;
-				}
 
-				//$('#demo').attr('src', songs[0].path);
-				if (canplay.length > 0) {
-					currentSong = songsplay[0];
-					canplay[0].currentTime = currentSong.startTime;
-					$('#albumart').attr('src', 'images/'+currentSong.album+'.jpg');
-					$('#'+currentSong.title.hashCode()).css('border', '3px solid #333');
-					canplay[0].play();
-					notplaying = false;
-				}
+					//$('#demo').attr('src', songs[0].path);
+					if (canplay.length > 0) {
+						currentSong = songsplay[0];
+						canplay[0].currentTime = currentSong.startTime;
+						$('#albumart').attr('src', 'images/'+currentSong.album+'.jpg');
+						$('#'+currentSong.title.hashCode()).css('border', '3px solid #333');
+						canplay[0].play();
+						notplaying = false;
+					}
 
+				}
 			}
+			catch {}
 			// if (songs.length == numsongs && start) {
 			// 	start = false;
 			// 	console.log("loading");
