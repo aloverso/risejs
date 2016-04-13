@@ -192,6 +192,7 @@ function Container() {
 							if (canplay.indexOf(this) < 0) {
 								canplay.push(this);
 								t = this.getAttribute('id');
+								console.log(t);
 								for (var j=0; j<numsongs; j++) {
 									if (songs[j].title === t) {
 										songsplay.push(songs[j]);
