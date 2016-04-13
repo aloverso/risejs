@@ -310,7 +310,7 @@ function Container() {
 
 	function nextsong() {
 		canplay[counter].pause();
-		if (counter < numsongs -1) {
+		if (counter < canplay.length -1) {
 			counter = counter + 1;
 			updatesong();
 		}
