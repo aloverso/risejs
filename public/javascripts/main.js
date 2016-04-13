@@ -154,6 +154,7 @@ function Container() {
 				data.guess = false;
 				if (songs.indexOf(data)<0) {
 					songs.push(data);
+					console.log('hella');
 				}
 				else {
 					$.get("getnewsong")
@@ -174,10 +175,13 @@ function Container() {
 									songs.push(data);
 								}
 								else {
-									throw 'Randomness Error: Please Reload'
+									throw ('Randomness Error: Please Reload');
 								}
-						}
-				}
+						});
+					}
+				});
+			}
+		});
 
 				//$loads.append("<audio id='"+data.title.hashCode()+"'></audio>");
 				//$('#'+data.title.hashCode()).attr('src', data.path);
@@ -189,7 +193,6 @@ function Container() {
 
 				//data.startTime = Math.floor(($('#demo')[0].duration-10) * Math.random());
 				//$('#preloads').append('<audio id="demo'+data.title.hashCode()+'" preload="auto" src="'+data.path+'"></audio>');
-			});
 
 			
 		}
@@ -201,7 +204,6 @@ function Container() {
 				}
 			}
 
-			try {
 				// first time
 				//**********************
 				if ((start || notplaying) && songs.length > 1) {
@@ -249,8 +251,6 @@ function Container() {
 					}
 
 				}
-			}
-			catch {}
 			// if (songs.length == numsongs && start) {
 			// 	start = false;
 			// 	console.log("loading");
