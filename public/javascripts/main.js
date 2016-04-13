@@ -152,7 +152,32 @@ function Container() {
 				
 				data.startTime = Math.floor((data.duration-15) * Math.random());
 				data.guess = false;
-				songs.push(data);
+				if (songs.indexOf(data)<0) {
+					songs.push(data);
+				}
+				else {
+					$.get("getnewsong")
+					.done(function(data) {
+						
+						data.startTime = Math.floor((data.duration-15) * Math.random());
+						data.guess = false;
+						if (songs.indexOf(data)<0) {
+							songs.push(data);
+						}
+						else {
+							$.get("getnewsong")
+							.done(function(data) {
+								
+								data.startTime = Math.floor((data.duration-15) * Math.random());
+								data.guess = false;
+								if (songs.indexOf(data)<0) {
+									songs.push(data);
+								}
+								else {
+									throw 'Randomness Error: Please Reload'
+								}
+						}
+				}
 
 				//$loads.append("<audio id='"+data.title.hashCode()+"'></audio>");
 				//$('#'+data.title.hashCode()).attr('src', data.path);
@@ -177,7 +202,7 @@ function Container() {
 			}
 			// first time
 			//**********************
-			if ((start || notplaying) && songs.length > 0) {
+			if ((start || notplaying) && songs.length > 1) {
 
 				if (start) {
 					console.log("FUCK");
