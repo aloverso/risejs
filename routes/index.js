@@ -2,8 +2,18 @@ var routes = {};
 var util = require('util');
 var fs = require('fs');
 var mm = require('musicmetadata');
-var allsongs = require('../allsongs.json');
+var allsongs = require('../allsongsnew.json');
 
+String.prototype.hashCode = function() {
+  var hash = 0, i, chr, len;
+  if (this.length === 0) return hash;
+  for (i = 0, len = this.length; i < len; i++) {
+    chr   = this.charCodeAt(i);
+    hash  = ((hash << 5) - hash) + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return this.charAt(0) + parseInt(Math.abs(hash));
+};
 
 routes.home = function(req,res) {
 	res.render('home');
@@ -20,20 +30,26 @@ routes.getnewsong = function(req,res) {
 	var randi = Math.floor(songslist.length * Math.random());
 	var randsong = songslist[randi];
 	console.log(randsong);
-
-	var parser = mm(fs.createReadStream('public/audios/Rise Against - '+randsong+'.mp3'), { duration: true }, function (err, metadata) {
-	  if (err) throw err;
-	  console.log(metadata);
-	  console.log(metadata.album);
-	  console.log("\n");
-
-	  res.json({
-	  	'title':randsong,
-	  	'album':metadata.album,
-	  	'path':'audios/Rise Against - '+randsong+'.mp3',
-	  	'duration':metadata.duration
+	res.json({
+	  	'title':randsong.title,
+	  	'album':randsong.album,
+	  	'path':randsong.url,
+	  	'duration':randsong.duration
 	  });
-	});
+
+	// var parser = mm(fs.createReadStream('public/audios/ra'+randsong.hashCode()+'.mp3'), { duration: true }, function (err, metadata) {
+	//   if (err) throw err;
+	//   console.log(metadata);
+	//   console.log(metadata.album);
+	//   console.log("\n");
+
+	//   res.json({
+	//   	'title':randsong,
+	//   	'album':metadata.album,
+	//   	'path':'audios/ra'+randsong.hashCode()+'.mp3',
+	//   	'duration':metadata.duration
+	//   });
+	// });
 
 	
 }

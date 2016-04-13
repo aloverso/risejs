@@ -5,12 +5,24 @@
 	padding: 10px;
 }
 
+.status-box:hover {
+	background: #ddd;
+}
+
 img#albumart {
 	max-width:100%;
 	max-height:100%;
 	align-self: center;
 	border-radius: 8px;
 	border: 5px solid #333;
+}
+
+.clickable {
+	cursor: pointer;
+}
+
+.fa.clickable:hover {
+	color: #444;
 }
 
 .wrap {
@@ -27,10 +39,30 @@ img#albumart {
 }
 
 .textdisp {
-	font-size: 300%;
+	font-size: 250%;
 	padding: 0.5em;
 }
 
 #submitbutton {
 	background-color: #58cbf1;
+}
+
+#loading {
+	text-align: center;
+	color: #555;
+	text-align: center;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 38px;
+	letter-spacing: .1rem;
+	text-transform: uppercase;
+}
+
+body {
+	margin-top: 20px;
+}
+
+#newg {
+	position: relative;
+	float: right;
 }
