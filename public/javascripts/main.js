@@ -70,6 +70,7 @@ function Container() {
 	var notplaying = true;
 	var timesecs = 0;
 	var score = 0;
+	var songlen = 5;
 
 	//var audioFiles = [];
 	var loads = [];
@@ -170,7 +171,7 @@ function Container() {
 
 		setInterval(function() {
 			if (currentSong) {
-				if (canplay[counter].currentTime >= currentSong.startTime + 10) {
+				if (canplay[counter].currentTime >= currentSong.startTime + songlen) {
 					canplay[counter].currentTime = currentSong.startTime;
 				}
 			}
@@ -179,6 +180,7 @@ function Container() {
 			if ((start || notplaying) && songs.length > 0) {
 
 				if (start) {
+					console.log("FUCK");
 					for (var i=0; i<numsongs; i++) {
 						var audioElement = document.createElement('audio');
 						audioElement.setAttribute('src', songs[i].path);
