@@ -3,6 +3,7 @@
   <source id="song" src="audios/satellite.mp3" type="audio/mpeg">
   Your browser does not support the audio element.
 </audio> -->
+<script src="javascripts/main.js"></script>
 
 <div class="container">
 <h2>Guess the Rise Against songs!</h2>
@@ -50,9 +51,9 @@
 
 			<div class="row">
 				<div class="wrap">
-					<form class="guessform">
+					<form class="guessform" onSubmit="submitGuess()">
 						<input id="guess" type="text" placeholder="What's the Song?"></input>
-						<input id="submitbutton" class="button" type="submit" value="Submit">
+						<input id="submitbutton" class="button" type="submit" value="Submit"></input>
 					</form>
 				</div>
 			</div>
@@ -66,7 +67,8 @@
 			  <button onclick="$('demo').volume-=0.1">Decrease Volume</button>
 			</div> -->
 
-			<button onclick="c.newgame()">new game</button>	
+			<button onclick="c.newgame()">start over</button>
+			<button onclick="restart()">new game</button>
 
 			<!-- <div id="preloads"></div>	 -->
 

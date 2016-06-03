@@ -4,6 +4,10 @@ var fs = require('fs');
 var mm = require('musicmetadata');
 var allsongs = require('../allsongsnew.json');
 
+var config = {
+};
+
+
 String.prototype.hashCode = function() {
   var hash = 0, i, chr, len;
   if (this.length === 0) return hash;
@@ -15,7 +19,11 @@ String.prototype.hashCode = function() {
   return this.charAt(0) + parseInt(Math.abs(hash));
 };
 
-routes.home = function(req,res) {
+// routes.startgame = function(req,res) {
+// 	res.redirect('game');
+// }
+
+routes.game = function(req,res) {
 	res.render('home');
 }
 
@@ -36,6 +44,19 @@ routes.getnewsong = function(req,res) {
 	  	'path':randsong.url,
 	  	'duration':randsong.duration
 	  });
+}
+
+routes.getConfig = function(req, res) {
+	res.json(config);
+}
+
+routes.updateConfig = function(req, res) {
+	var p = {};
+	for (var key in req.body) {
+	    p[key] = parseInt(req.body[key]);
+	}
+	config=p;
+}
 
 	// var parser = mm(fs.createReadStream('public/audios/ra'+randsong.hashCode()+'.mp3'), { duration: true }, function (err, metadata) {
 	//   if (err) throw err;
@@ -52,6 +73,5 @@ routes.getnewsong = function(req,res) {
 	// });
 
 	
-}
 
 module.exports = routes;

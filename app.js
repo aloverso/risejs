@@ -35,10 +35,11 @@ app.set('view engine', 'handlebars');
 // }));
 
 /* ROUTING */
-app.get('/', index.home);
+app.get('/', index.setup);
 app.get('/getnewsong', index.getnewsong);
-app.get('/setup', index.setup);
-
+app.get('/game', index.game);
+app.get('/getConfig', index.getConfig);
+app.post('/updateConfig', index.updateConfig);
 
 app.listen(process.env.PORT || 3000);
 console.log("Running on port 3000");

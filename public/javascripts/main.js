@@ -59,18 +59,22 @@ var opts = {
 , position: 'absolute' // Element positioning
 }
 
-function Container() {
+function Container(ns, sl, aa) {
 
 	//var startTime = 0;
 	var currentSong;
-	var numsongs = 10;
 	var songs = [];
 	var counter = 0;
 	var start = true;
 	var notplaying = true;
 	var timesecs = 0;
 	var score = 0;
-	var songlen = 5;
+	var songlen = sl;
+	var numsongs = ns;
+	var albumart = aa;
+
+	var timerint;
+	var songcheckint;
 
 	//var audioFiles = [];
 	var loads = [];
@@ -197,7 +201,7 @@ function Container() {
 			
 		}
 
-		setInterval(function() {
+		songcheckint = setInterval(function() {
 			if (currentSong) {
 				if (canplay[counter].currentTime >= currentSong.startTime + songlen) {
 					canplay[counter].currentTime = currentSong.startTime;
@@ -206,7 +210,7 @@ function Container() {
 
 				// first time
 				//**********************
-				if ((start || notplaying) && songs.length > 1) {
+				if ((start || notplaying) && songs.length == numsongs) {
 
 					if (start) {
 						console.log("FUCK");
@@ -217,21 +221,33 @@ function Container() {
 							audioElement.load();
 							audioElement.setAttribute('id',songs[i].title)
 							audioElement.preload = "auto";
+							console.log(audioElement);
+							audioElement.added = false;
 							audioElement.oncanplaythrough = function() {
-								if (canplay.indexOf(this) < 0) {
+								// console.log("woot");
+								// console.log(canplay);
+								// console.log(this.added);
+								// console.log(canplay.indexOf(this));
+								if (canplay.indexOf(this) < 0 && !this.added) {
+									console.log("woott");
 									canplay.push(this);
+									console.log("woottt");
 									t = this.getAttribute('id');
+									console.log("woot"+t);
 									for (var j=0; j<numsongs; j++) {
 										if (songs[j].title === t) {
 											songsplay.push(songs[j]);
+											console.log("woot2"+t);
 											break;
 										}
 									}
+									console.log("woot3"+t);
 									$('#loading').remove();
 									$('#status').append("<div class='status-box clickable' id='"+t.hashCode()+"' onclick='c.jumpsong("+(canplay.indexOf(this))+")'>"+(canplay.indexOf(this)+1)+"</div>");
 									if (canplay.length < numsongs) {
 										$('#status').append("<div id='loading'>LOADING...</div>");
 									}
+									this.added = true;
 
 								}
 							}
@@ -242,9 +258,14 @@ function Container() {
 
 					//$('#demo').attr('src', songs[0].path);
 					if (canplay.length > 0) {
+						console.log(canplay);
 						currentSong = songsplay[0];
 						canplay[0].currentTime = currentSong.startTime;
-						$('#albumart').attr('src', 'images/'+currentSong.album+'.jpg');
+						if(albumart) {
+							$('#albumart').attr('src', 'images/'+currentSong.album+'.jpg');
+						} else {
+							$('#albumart').attr('src', 'images/noart.jpg');
+						}
 						$('#'+currentSong.title.hashCode()).css('border', '3px solid #333');
 						canplay[0].play();
 						notplaying = false;
@@ -268,7 +289,7 @@ function Container() {
 			//console.log(currentSong);
 		}, 500);
 
-		setInterval(function() {
+		timerint = setInterval(function() {
 			timesecs += 1;
 			$('#timer').html("Time: "+formatSecString(timesecs));
 		}, 1000);
@@ -368,7 +389,9 @@ function Container() {
 		$('#'+currentSong.title.hashCode()).css('border', '0px solid #333');
 		currentSong = song;
 		$('#'+currentSong.title.hashCode()).css('border', '3px solid #333');
-		$('#albumart').attr('src', '');
+		if (albumart) {
+			$('#albumart').attr('src', '');
+		}
 		// loads[counter].pause();
 		// var target = document.getElementById('albumart');
 		// var spinner = new Spinner(opts).spin(target);
@@ -378,7 +401,9 @@ function Container() {
 		// 	// spinner.stop();
 		canplay[counter].currentTime = currentSong.startTime;
 		canplay[counter].play();
-		$('#albumart').attr('src', 'images/'+currentSong.album+'.jpg');
+		if (albumart) {
+			$('#albumart').attr('src', 'images/'+currentSong.album+'.jpg');
+		}
 		$('#playpauser').attr('class', 'fa fa-pause-circle-o fa-5x');
 		// }
 		// canplay[counter].oncanplay = function() {
@@ -394,24 +419,35 @@ function Container() {
 	}
 
 	function newgame() {
-		canplay[counter].pause();
-		currentSong = null;
-		songs = [];
-		counter = 0;
-		start = true;
-		notplaying = true;
-		timesecs = 0;
-		score = 0;
+		//console.log('NOOOOOOOOOOOOOOOOO');
+		location.reload();
+		
+		// console.log(canplay.length);
+		// console.log(counter);
+		// if (canplay.length > counter) {
+		// 	canplay[counter].pause();
+		// }
+		// clearInterval(timerint);
+		// clearInterval(songcheckint);
+		// timerint = null;
+		// songcheckint = null;
+		// currentSong = null;
+		// songs = [];
+		// counter = 0;
+		// start = true;
+		// notplaying = true;
+		// timesecs = 0;
+		// score = 0;
 
-		loads = [];
+		// loads = [];
 
-		canplay = [];
-		songsplay = [];
+		// canplay = [];
+		// songsplay = [];
 
-		setgame();
-		$('#timer').html("0");
-		$('#score').html("0");
-		$('#status').html("");
+		// setgame();
+		// $('#timer').html("Time: 0");
+		// $('#score').html("Score: 0");
+		// $('#status').html("");
 	}
 
 	function formatSecString(secs) {
@@ -446,16 +482,38 @@ function Container() {
 	
 }
 
-var c = new Container();
+var c;
+var CONFIG;
 
-c.setgame();
+$.get('/getConfig').done(function(data) {
+	CONFIG = data;
+	console.log(typeof(CONFIG.gameplay));
+
+	// FIXED NUMBER OF SONGS
+	if (!CONFIG.gameplay) {
+		console.log('waht');
+		c = new Container(CONFIG.numsongs, CONFIG.songlen, CONFIG.albumart);
+
+		c.setgame();
+		console.log(c);
+	}
+
+	// $('#submitbutton').click(
+});
 
 var $guessForm = $('form.guessform').unbind();
-$guessForm.submit(function(event) {
+
+function submitGuess() {
 	event.preventDefault();
-	var guess = $guessForm.find('#guess').val();
-	$guessForm.find('#guess').val('');
-	//console.log(strip(currentSong.title));
+	var guess = $('#guess').val();
+	$('#guess').val('');
+	// console.log(strip(currentSong.title));
 	
 	c.checkGuess(guess);
-});
+	return false;
+};
+
+function restart() {
+	$(location).attr('href', '/')
+}
+

@@ -1,15 +1,48 @@
+<link rel="stylesheet" href="css/setupstyles.css">
+<link rel="stylesheet" href="css/rangeslider.css">
+<script src="javascripts/rangeslider.min.js"></script>
+
 <h1>Start a New Game</h1>
 
 <div class="container">
 	<div class="row">
 		<div class="twelve columns">
-			<form class="setupform">
-				<button class="active" onclick="fixedtime()">Fixed Time</button>
-				<button onclick="fixednum()">Fixed Number of Songs</button>
-
-				
-				<input id="submitbutton" class="button" type="submit" value="Submit">
-			</form>
+			<button id='fixedtime' onclick="fixedtime()">Fixed Time</button>
+			<button id='fixednum' class="active" onclick="fixednum()">Fixed Number of Songs</button>
 		</div>
 	</div>
+	<div>Number of Songs to Guess</div>
+	<div class="row">
+		<div class="four columns">
+			
+			<input id="numsongs" type="range" class="rangeslider" min="2" max="25" step="1" value="10" data-orientation="vertical">
+		</div>
+		<div id="numsongs-res" class="four columns result">10</div>
+	</div>
+
+	<div>Audio clip length (seconds)</div>
+	<div class="row">
+		<div class="four columns">
+			
+			<input id="songlen" type="range" class="rangeslider" min="1" max="25" step="1" value="10" data-orientation="vertical">
+		</div>
+		<div id="songlen-res" class="four columns result">10</div>
+	</div>
+
+	<div>Show Album Art?</div>
+	<div class="row">
+		<div class="onoffswitch">
+		    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" style="display:none"checked>
+		    <label class="onoffswitch-label" for="myonoffswitch">
+		        <span class="onoffswitch-inner"></span>
+		        <span class="onoffswitch-switch"></span>
+		    </label>
+		</div>
+	</div>
+
+	<div class="row">
+		<button id="startgame" onclick="startgame()">Start Game</button>
+	</div>
 </div>
+
+<script src="javascripts/setup.js"></script>
