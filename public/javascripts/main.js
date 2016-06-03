@@ -1,30 +1,3 @@
-// // //Create the audio tag
-// var soundFile = document.createElement("audio");
-// soundFile.preload = "auto";
-
-// // //Load the sound file (using a source element for expandability)
-// var src = document.createElement("source");
-// src.src = "audios/satellite.mp3";
-// soundFile.appendChild(src);
-
-// // //Load the audio tag
-// // //It auto plays as a fallback
-// soundFile.load();
-// soundFile.volume = 0.000000;
-// soundFile.play();
-
-// play();
-	
-// // //Plays the sound
-// function play() {
-//    //Set the current time for the audio file to the beginning
-//    soundFile.currentTime = 0.01;
-//    soundFile.volume = volume;
-
-//    //Due to a bug in Firefox, the audio needs to be played after a delay
-//    setTimeout(function(){soundFile.play();},1);
-// }
-
 String.prototype.hashCode = function() {
   var hash = 0, i, chr, len;
   if (this.length === 0) return hash;
@@ -36,32 +9,8 @@ String.prototype.hashCode = function() {
   return this.charAt(0) + parseInt(Math.abs(hash));
 };
 
-var opts = {
-  lines: 11 // The number of lines to draw
-, length: 29 // The length of each line
-, width: 16 // The line thickness
-, radius: 46 // The radius of the inner circle
-, scale: 1 // Scales overall size of the spinner
-, corners: 1 // Corner roundness (0..1)
-, color: '#000' // #rgb or #rrggbb or array of colors
-, opacity: 0.25 // Opacity of the lines
-, rotate: 0 // The rotation offset
-, direction: 1 // 1: clockwise, -1: counterclockwise
-, speed: 0.8 // Rounds per second
-, trail: 60 // Afterglow percentage
-, fps: 20 // Frames per second when using setTimeout() as a fallback for CSS
-, zIndex: 2e9 // The z-index (defaults to 2000000000)
-, className: 'spinner' // The CSS class to assign to the spinner
-, top: '50%' // Top position relative to parent
-, left: '50%' // Left position relative to parent
-, shadow: false // Whether to render a shadow
-, hwaccel: false // Whether to use hardware acceleration
-, position: 'absolute' // Element positioning
-}
-
 function Container(ns, sl, aa) {
 
-	//var startTime = 0;
 	var currentSong;
 	var songs = [];
 	var counter = 0;
@@ -76,7 +25,6 @@ function Container(ns, sl, aa) {
 	var timerint;
 	var songcheckint;
 
-	//var audioFiles = [];
 	var loads = [];
 
 	var canplay = [];
@@ -90,64 +38,7 @@ function Container(ns, sl, aa) {
 	this.jumpsong = jumpsong;
 	this.checkGuess = checkGuess;
 
-	// function setgame() {
-	// 	for (var i=0; i<20; i++) {
-	// 		$.get("getnewsong")
-	// 		.done(function(data) {
-	// 			//data.startTime = Math.floor(($('#demo')[0].duration-10) * Math.random());
-	// 			songs.push(data);
-	// 		});
-	// 	}
-	// }
 	var alpha = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
-
-	// function preloadAudio(url) {
-	//     var audio = new Audio();
-	//     // once this file loads, it will call loadedAudio()
-	//     // the file will be kept by the browser as cache
-	//     audio.addEventListener('canplay', loadedAudio, false);
-	//     audio.src = url;
-	//     //audio.currentTime = 30;
-	// }
-
-	// var loaded = 0;
-	// function loadedAudio() {
-	//     // this will be called every time an audio file is loaded
-	//     // we keep track of the loaded files vs the requested files
-	//     console.log("holla");
-	//     console.log(this);
-	//     console.log(songs[0])
-	//     play(0);
-	//     loaded++;
-	//     if (loaded == numsongs){
-	//     	// all have loaded
-	//     	//init();
-	//     }
-	// }
-
-	// function init() {
-	//     // do your stuff here, audio has been loaded
-	//     // for example, play all files one after the other
-	//     var i = 0;
-	//     // once the player ends, play the next one
-	//     player.onended = function() {
-	//     	i++;
-	//         if (i >= audioFiles.length) {
-	//             // end 
-	//             return;
-	//         }
-	//     	play(i);
-	//     };
-	//     // play the first file
-	//     play(i);
-	// }
-
-	// var player = document.getElementById('player');
-
-	// function play(index) {
-	//     player.src = songs[index].path;
-	//     player.play();
-	// }
 
 	function setgame() {
 		for (var i=0; i<numsongs; i++) {
@@ -186,18 +77,6 @@ function Container(ns, sl, aa) {
 				});
 			}
 		});
-
-				//$loads.append("<audio id='"+data.title.hashCode()+"'></audio>");
-				//$('#'+data.title.hashCode()).attr('src', data.path);
-
-				// $('#'+data.title.hashCode())[0].oncanplay = function() {
-				// 	data.startTime = Math.floor(($('#'+data.title.hashCode())[0].duration-10) * Math.random());
-				// 	songs.push(data);
-				// }
-
-				//data.startTime = Math.floor(($('#demo')[0].duration-10) * Math.random());
-				//$('#preloads').append('<audio id="demo'+data.title.hashCode()+'" preload="auto" src="'+data.path+'"></audio>');
-
 			
 		}
 
@@ -224,10 +103,6 @@ function Container(ns, sl, aa) {
 							console.log(audioElement);
 							audioElement.added = false;
 							audioElement.oncanplaythrough = function() {
-								// console.log("woot");
-								// console.log(canplay);
-								// console.log(this.added);
-								// console.log(canplay.indexOf(this));
 								if (canplay.indexOf(this) < 0 && !this.added) {
 									console.log("woott");
 									canplay.push(this);
@@ -256,7 +131,6 @@ function Container(ns, sl, aa) {
 						start = false;
 					}
 
-					//$('#demo').attr('src', songs[0].path);
 					if (canplay.length > 0) {
 						console.log(canplay);
 						currentSong = songsplay[0];
@@ -272,21 +146,6 @@ function Container(ns, sl, aa) {
 					}
 
 				}
-			// if (songs.length == numsongs && start) {
-			// 	start = false;
-			// 	console.log("loading");
-			// 	// we start preloading all the audio files
-			// 	// var audioElement = document.createElement('audio');
-			// 	// audioElement.setAttribute('src', songs[0].path);
-			// 	// audioElement.load();
-			// 	// audioElement.currentTime = 30;
-			// 	// audioElement.play();
-			// 	for (var i in songs) {
-				    
-			// 	    //preloadAudio(songs[i].path);
-			// 	}
-			// }
-			//console.log(currentSong);
 		}, 500);
 
 		timerint = setInterval(function() {
@@ -297,32 +156,6 @@ function Container(ns, sl, aa) {
 
 
 	}
-
-	// function getcurrent() {
-	// 	console.log($('#demo')[0].currentTime);
-	// 	console.log(currentSong.startTime);
-	// }
-
-	// function newsong() {
-	// 	$('#demo').attr('src', 'audios/helpisontheway.mp3');
-	// 	//console.log($('#demo').attr('src'));
-	// 	//document.getElementById("demo").currentTime = 10;
-	// 	$('#demo')[0].oncanplay = function() {
-	// 		if ($('#demo')[0].currentTime < 1) {
-	// 			startTime = Math.floor(($('#demo')[0].duration-10) * Math.random());
-	// 			console.log(startTime);
-	// 			$('#demo')[0].currentTime = startTime;
-	// 		}
-	// 	}
-	// 		// console.log($('#demo')[0].duration);
-			
-	// 		// 
-	// 		// $('#demo')[0].play();
-	// 		// console.log($('#demo')[0].currentTime);
-
-	// 	//}
-	// 	//console.log(startTime);
-	// }
 
 	function playpause() {
 		if (canplay[counter].paused) {
@@ -338,27 +171,6 @@ function Container(ns, sl, aa) {
 	function pausesong() {
 		canplay[counter].pause();
 	}
-
-	// function skiptoten() {
-	// 	document.getElementById("demo").currentTime = 10;
-	// }
-
-	// function nextsong() {
-	// 	$.get("getnewsong")
-	// 	.done(function(data) {
-
-	// 		$('#demo').attr('src', data.path);
-	// 		$('#demo')[0].oncanplay = function() {
-	// 			if ($('#demo')[0].currentTime < 1) {
-	// 				startTime = Math.floor(($('#demo')[0].duration-10) * Math.random());
-	// 				console.log(startTime);
-	// 				$('#demo')[0].currentTime = startTime;
-	// 				currentSong = data.title;
-	// 				$('#albumart').attr('src', 'images/'+data.album+'.jpg');
-	// 			}
-	// 		}
-	// 	});
-	// }
 
 	function nextsong() {
 		canplay[counter].pause();
@@ -384,7 +196,6 @@ function Container(ns, sl, aa) {
 
 	function updatesong() {
 		song = songsplay[counter];
-		//*******$('#demo').attr('src', song.path);
 
 		$('#'+currentSong.title.hashCode()).css('border', '0px solid #333');
 		currentSong = song;
@@ -392,62 +203,17 @@ function Container(ns, sl, aa) {
 		if (albumart) {
 			$('#albumart').attr('src', '');
 		}
-		// loads[counter].pause();
-		// var target = document.getElementById('albumart');
-		// var spinner = new Spinner(opts).spin(target);
-
-
-		// if (canplay[counter].currentTime < 1) {
-		// 	// spinner.stop();
+	
 		canplay[counter].currentTime = currentSong.startTime;
 		canplay[counter].play();
 		if (albumart) {
 			$('#albumart').attr('src', 'images/'+currentSong.album+'.jpg');
 		}
 		$('#playpauser').attr('class', 'fa fa-pause-circle-o fa-5x');
-		// }
-		// canplay[counter].oncanplay = function() {
-		// 	console.log("HELLA");
-		// 	if (canplay[counter].currentTime < 1) {
-		// 		// spinner.stop();
-		// 		canplay[counter].currentTime = currentSong.startTime;
-		// 		canplay[counter].play();
-		// 		$('#albumart').attr('src', 'images/'+currentSong.album+'.jpg');
-		// 		$('#playpauser').attr('class', 'fa fa-pause-circle-o fa-5x');
-		// 	}
-		// }
 	}
 
 	function newgame() {
-		//console.log('NOOOOOOOOOOOOOOOOO');
 		location.reload();
-		
-		// console.log(canplay.length);
-		// console.log(counter);
-		// if (canplay.length > counter) {
-		// 	canplay[counter].pause();
-		// }
-		// clearInterval(timerint);
-		// clearInterval(songcheckint);
-		// timerint = null;
-		// songcheckint = null;
-		// currentSong = null;
-		// songs = [];
-		// counter = 0;
-		// start = true;
-		// notplaying = true;
-		// timesecs = 0;
-		// score = 0;
-
-		// loads = [];
-
-		// canplay = [];
-		// songsplay = [];
-
-		// setgame();
-		// $('#timer').html("Time: 0");
-		// $('#score').html("Score: 0");
-		// $('#status').html("");
 	}
 
 	function formatSecString(secs) {
@@ -478,8 +244,6 @@ function Container(ns, sl, aa) {
 			}
 		}
 	}
-
-	
 }
 
 var c;
@@ -497,8 +261,6 @@ $.get('/getConfig').done(function(data) {
 		c.setgame();
 		console.log(c);
 	}
-
-	// $('#submitbutton').click(
 });
 
 var $guessForm = $('form.guessform').unbind();
@@ -507,7 +269,6 @@ function submitGuess() {
 	event.preventDefault();
 	var guess = $('#guess').val();
 	$('#guess').val('');
-	// console.log(strip(currentSong.title));
 	
 	c.checkGuess(guess);
 	return false;
