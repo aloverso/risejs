@@ -7,16 +7,26 @@ var CONFIG = {
     "gameplay": 0,
     "songlen": 5,
     "numsongs": 10,
-    "albumart": 1
+    "albumart": 1,
+    "playtime":3
 };
 
 $.post('/updateConfig',CONFIG).success();
+
+function formatSecString(secs) {
+	    var mins = Math.floor(secs/60);
+	    var se = Math.floor(secs % 60);
+	    return mins+"m"+se+"s";
+	}
 
 function fixedtime() {
 	CONFIG.gameplay = 1;
 	console.log(CONFIG);
 	$('#fixedtime').attr('class','active');
 	$('#fixednum').removeClass('active');
+
+	$('#allotted').css('display', 'block');
+	$('#playtime-res').text(formatSecString(180));
 
 	return false;
 }
@@ -58,7 +68,12 @@ $(document).ready(function () {
 
 $('input').on('input', function () {
 	CONFIG[$(this).attr('id')] = $(this).val();
-	$('#'+$(this).attr('id')+"-res").text($(this).val());
+	
+	if($(this).attr('id') === 'playtime') {
+		$('#'+$(this).attr('id')+"-res").text(formatSecString(parseInt($(this).val())));
+	} else {
+		$('#'+$(this).attr('id')+"-res").text($(this).val());
+	}
 });
 
 // $('input[type="range"]').rangeslider({

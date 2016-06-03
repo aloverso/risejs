@@ -9,18 +9,19 @@ String.prototype.hashCode = function() {
   return this.charAt(0) + parseInt(Math.abs(hash));
 };
 
-function Container(ns, sl, aa) {
+function Container(gameplay, numsongs, songlen, albumart, playtime) {
 
 	var currentSong;
 	var songs = [];
 	var counter = 0;
 	var start = true;
 	var notplaying = true;
-	var timesecs = 0;
+	var timesecs = playtime;
 	var score = 0;
-	var songlen = sl;
-	var numsongs = ns;
-	var albumart = aa;
+	var songlen = songlen;
+	var numsongs = numsongs;
+	var albumart = albumart;
+	var ended = false;
 
 	var timerint;
 	var songcheckint;
@@ -29,6 +30,7 @@ function Container(ns, sl, aa) {
 
 	var canplay = [];
 	var songsplay = [];
+	var guesses = -1;
 
 	this.setgame = setgame;
 	this.newgame = newgame;
@@ -38,16 +40,22 @@ function Container(ns, sl, aa) {
 	this.jumpsong = jumpsong;
 	this.checkGuess = checkGuess;
 
+	function gameEnded() {
+		return ended;
+	}
+
 	var alpha = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
 
 	function setgame() {
 		for (var i=0; i<numsongs; i++) {
+
+			// make sure we don't have song repeats
 			$.get("getnewsong")
 			.done(function(data) {
 				
 				data.startTime = Math.floor((data.duration-15) * Math.random());
 				data.guess = false;
-				if (songs.indexOf(data)<0) {
+				if (songs.indexOf(data)<=0) {
 					songs.push(data);
 					console.log('hella');
 				}
@@ -57,7 +65,7 @@ function Container(ns, sl, aa) {
 						
 						data.startTime = Math.floor((data.duration-15) * Math.random());
 						data.guess = false;
-						if (songs.indexOf(data)<0) {
+						if (songs.indexOf(data)<=0) {
 							songs.push(data);
 						}
 						else {
@@ -66,7 +74,7 @@ function Container(ns, sl, aa) {
 								
 								data.startTime = Math.floor((data.duration-15) * Math.random());
 								data.guess = false;
-								if (songs.indexOf(data)<0) {
+								if (songs.indexOf(data)<=0) {
 									songs.push(data);
 								}
 								else {
@@ -87,6 +95,13 @@ function Container(ns, sl, aa) {
 				}
 			}
 
+			// if guessed all (loaded) songs
+			if (guesses >= songsplay.length) {
+				ended = true;
+				$('#interaction-unit').css('display', 'none');
+				$('#loading').remove();
+			}
+
 				// first time
 				//**********************
 				if ((start || notplaying) && songs.length == numsongs) {
@@ -103,7 +118,7 @@ function Container(ns, sl, aa) {
 							console.log(audioElement);
 							audioElement.added = false;
 							audioElement.oncanplaythrough = function() {
-								if (canplay.indexOf(this) < 0 && !this.added) {
+								if (canplay.indexOf(this) < 0 && !this.added && !gameEnded()) {
 									console.log("woott");
 									canplay.push(this);
 									console.log("woottt");
@@ -123,7 +138,6 @@ function Container(ns, sl, aa) {
 										$('#status').append("<div id='loading'>LOADING...</div>");
 									}
 									this.added = true;
-
 								}
 							}
 							loads.push(audioElement);
@@ -149,12 +163,36 @@ function Container(ns, sl, aa) {
 		}, 500);
 
 		timerint = setInterval(function() {
-			timesecs += 1;
-			$('#timer').html("Time: "+formatSecString(timesecs));
+			if (gameplay) {
+				timesecs -= 1;
+				if (timesecs <= 15) {
+					$('#timer').css('color','#fe2c3b');
+				}
+
+				if (timesecs < 0) {
+					canplay[counter].pause();
+					$('#interaction-unit').css('display', 'none');
+					$('#loading').remove();
+
+					for(var i=0; i<songsplay.length; i++) {
+						var s = songsplay[i];
+						if (!s.guess) {
+							s.guess = true;
+							$('#'+s.title.hashCode()).html("<i class='fa fa-times-circle'></i> "+s.title);
+							$('#'+s.title.hashCode()).css('background', '#fe2c3b');
+						}
+					}
+
+					ended = true;
+				} else {
+					$('#timer').html("Time: "+formatSecString(timesecs));
+				}
+			} else if (!ended) {
+				timesecs += 1;
+				$('#timer').html("Time: "+formatSecString(timesecs));
+			}
+
 		}, 1000);
-
-
-
 	}
 
 	function playpause() {
@@ -195,21 +233,23 @@ function Container(ns, sl, aa) {
 	}
 
 	function updatesong() {
-		song = songsplay[counter];
+		if (!ended) {
+			song = songsplay[counter];
 
-		$('#'+currentSong.title.hashCode()).css('border', '0px solid #333');
-		currentSong = song;
-		$('#'+currentSong.title.hashCode()).css('border', '3px solid #333');
-		if (albumart) {
-			$('#albumart').attr('src', '');
+			$('#'+currentSong.title.hashCode()).css('border', '0px solid #333');
+			currentSong = song;
+			$('#'+currentSong.title.hashCode()).css('border', '3px solid #333');
+			if (albumart) {
+				$('#albumart').attr('src', '');
+			}
+		
+			canplay[counter].currentTime = currentSong.startTime;
+			canplay[counter].play();
+			if (albumart) {
+				$('#albumart').attr('src', 'images/'+currentSong.album+'.jpg');
+			}
+			$('#playpauser').attr('class', 'fa fa-pause-circle-o fa-5x');
 		}
-	
-		canplay[counter].currentTime = currentSong.startTime;
-		canplay[counter].play();
-		if (albumart) {
-			$('#albumart').attr('src', 'images/'+currentSong.album+'.jpg');
-		}
-		$('#playpauser').attr('class', 'fa fa-pause-circle-o fa-5x');
 	}
 
 	function newgame() {
@@ -229,6 +269,8 @@ function Container(ns, sl, aa) {
 	function checkGuess(guess) {
 		if (!currentSong.guess) {
 			currentSong.guess = true;
+			if (guesses < 0) guesses=1;
+			else guesses+=1;
 
 			if (strip(guess) === strip(currentSong.title)) {
 				score += 1;
@@ -254,13 +296,13 @@ $.get('/getConfig').done(function(data) {
 	console.log(typeof(CONFIG.gameplay));
 
 	// FIXED NUMBER OF SONGS
-	if (!CONFIG.gameplay) {
-		console.log('waht');
-		c = new Container(CONFIG.numsongs, CONFIG.songlen, CONFIG.albumart);
+	// if (CONFIG.gameplay === 0) {
+	console.log('waht');
+	c = new Container(CONFIG.gameplay, CONFIG.numsongs, CONFIG.songlen, CONFIG.albumart, CONFIG.playtime);
 
-		c.setgame();
-		console.log(c);
-	}
+	c.setgame();
+	console.log(c);
+	// }
 });
 
 var $guessForm = $('form.guessform').unbind();
