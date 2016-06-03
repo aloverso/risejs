@@ -8,7 +8,7 @@ var CONFIG = {
     "songlen": 5,
     "numsongs": 10,
     "albumart": 1,
-    "playtime":3
+    "playtime":180
 };
 
 $.post('/updateConfig',CONFIG).success();
