@@ -10,7 +10,7 @@ var logger = require('morgan');
 
 // ...local
 var index = require('./routes/index.js');
-
+var favicon = require('serve-favicon');
 
 /* CONNECT TO MONGOOSE */
 //mongoose.connect(process.env.MONGOURI || 'mongodb://localhost/risejs');
@@ -25,6 +25,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.engine('handlebars', exphbs({defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
+
+app.use(favicon(__dirname + '/public/images/favicon.ico'));
 
 // cookie sessions
 // app.use(session({ 
