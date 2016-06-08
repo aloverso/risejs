@@ -39,6 +39,7 @@ function Container(gameplay, numsongs, songlen, albumart, playtime) {
 	this.backsong = backsong;
 	this.jumpsong = jumpsong;
 	this.checkGuess = checkGuess;
+	this.giveup = giveup
 
 	function gameEnded() {
 		return ended;
@@ -46,47 +47,62 @@ function Container(gameplay, numsongs, songlen, albumart, playtime) {
 
 	var alpha = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
 
-	function setgame() {
-		for (var i=0; i<numsongs; i++) {
+	function giveup() {
+		revealanswers();
+	}
 
-			// make sure we don't have song repeats
-			$.get("getnewsong")
-			.done(function(data) {
-				
-				data.startTime = Math.floor((data.duration-15) * Math.random());
-				data.guess = false;
-				if (songs.indexOf(data)<=0) {
-					songs.push(data);
-					console.log('hella');
-				}
-				else {
-					$.get("getnewsong")
-					.done(function(data) {
-						
-						data.startTime = Math.floor((data.duration-15) * Math.random());
-						data.guess = false;
-						if (songs.indexOf(data)<=0) {
-							songs.push(data);
-						}
-						else {
-							$.get("getnewsong")
-							.done(function(data) {
-								
-								data.startTime = Math.floor((data.duration-15) * Math.random());
-								data.guess = false;
-								if (songs.indexOf(data)<=0) {
-									songs.push(data);
-								}
-								else {
-									throw ('Randomness Error: Please Reload');
-								}
-						});
-					}
-				});
+	function updateSongList(song) {
+		songs.push(song);
+	}
+
+	function setgame() {
+
+		// make sure we don't have song repeats
+		$.get("getnsongs", {n:numsongs})
+		.done(function(data) {
+			console.log(data.length);
+
+			for (var i=0; i<numsongs; i++) {
+				console.log(data[i]);
+				songs.push(data[i]);
 			}
-		});
+			console.log(songs);
+		});	
+
 			
-		}
+		// 	data.startTime = Math.floor((data.duration-15) * Math.random());
+		// 	data.guess = false;
+		// 	console.log(songs);
+		// 	if (songs.indexOf(data)<=0) {
+		// 		songs.push(data);
+		// 		console.log('hella');
+		// 	}
+		// 	else {
+		// 		$.get("getnewsong")
+		// 		.done(function(data) {
+					
+		// 			data.startTime = Math.floor((data.duration-15) * Math.random());
+		// 			data.guess = false;
+		// 			if (songs.indexOf(data)<=0) {
+		// 				songs.push(data);
+		// 			}
+		// 			else {
+		// 				$.get("getnewsong")
+		// 				.done(function(data) {
+							
+		// 					data.startTime = Math.floor((data.duration-15) * Math.random());
+		// 					data.guess = false;
+		// 					if (songs.indexOf(data)<=0) {
+		// 						songs.push(data);
+		// 					}
+		// 					else {
+		// 						location.reload();
+		// 					}
+		// 			});
+		// 		}
+		// 	});
+		// }
+		
 
 		songcheckint = setInterval(function() {
 			if (currentSong) {
@@ -98,13 +114,14 @@ function Container(gameplay, numsongs, songlen, albumart, playtime) {
 			// if guessed all (loaded) songs
 			if (guesses >= songsplay.length) {
 				ended = true;
+				canplay[0].pause();
 				$('#interaction-unit').css('display', 'none');
 				$('#loading').remove();
 			}
 
 				// first time
 				//**********************
-				if ((start || notplaying) && songs.length == numsongs) {
+				if ((start || notplaying) && songs.length === numsongs) {
 
 					if (start) {
 						console.log("FUCK");
@@ -163,36 +180,41 @@ function Container(gameplay, numsongs, songlen, albumart, playtime) {
 		}, 500);
 
 		timerint = setInterval(function() {
-			if (gameplay) {
+			// gameplay = 1, time decreasing
+			if (gameplay && !notplaying) {
 				timesecs -= 1;
 				if (timesecs <= 15) {
 					$('#timer').css('color','#fe2c3b');
 				}
 
 				if (timesecs < 0) {
-					canplay[counter].pause();
-					$('#interaction-unit').css('display', 'none');
-					$('#loading').remove();
-
-					for(var i=0; i<songsplay.length; i++) {
-						var s = songsplay[i];
-						if (!s.guess) {
-							s.guess = true;
-							$('#'+s.title.hashCode()).html("<i class='fa fa-times-circle'></i> "+s.title);
-							$('#'+s.title.hashCode()).css('background', '#fe2c3b');
-						}
-					}
-
-					ended = true;
+					revealanswers();
 				} else {
 					$('#timer').html("Time: "+formatSecString(timesecs));
 				}
-			} else if (!ended) {
+			} else if (!ended && !notplaying) {
 				timesecs += 1;
 				$('#timer').html("Time: "+formatSecString(timesecs));
 			}
 
 		}, 1000);
+	}
+
+	function revealanswers() {
+		canplay[counter].pause();
+		$('#interaction-unit').css('display', 'none');
+		$('#loading').remove();
+
+		for(var i=0; i<songsplay.length; i++) {
+			var s = songsplay[i];
+			if (!s.guess) {
+				s.guess = true;
+				$('#'+s.title.hashCode()).html("<i class='fa fa-times-circle'></i> "+s.title);
+				$('#'+s.title.hashCode()).css('background', '#fe2c3b');
+			}
+		}
+
+		ended = true;
 	}
 
 	function playpause() {
@@ -266,13 +288,34 @@ function Container(gameplay, numsongs, songlen, albumart, playtime) {
 		return s.toLowerCase().replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
 	}
 
+	function amendguess(stripped) {
+		switch(stripped) {
+			case "re education through labor":
+			case "reeducation":
+			case "re education":
+				return "reeducation through labor";
+				break;
+			case "make it stop":
+			case "septembers children":
+				return "make it stop septembers children";
+				break;
+			case "collapse":
+				return "collapse post amerika";
+				break;
+			default:
+				return stripped;
+		}
+	}
+
 	function checkGuess(guess) {
 		if (!currentSong.guess) {
 			currentSong.guess = true;
 			if (guesses < 0) guesses=1;
 			else guesses+=1;
 
-			if (strip(guess) === strip(currentSong.title)) {
+			console.log(currentSong.title, strip(currentSong.title), typeof(currentSong.title));
+			if (amendguess(strip(guess)) === strip(currentSong.title)) {
+				console.log(amendguess(strip(guess)), strip(currentSong.title));
 				score += 1;
 				$('#score').html("Score: "+score);
 				$('#'+currentSong.title.hashCode()).html("<i class='fa fa-check-circle'></i> "+currentSong.title);

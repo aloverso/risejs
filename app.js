@@ -37,8 +37,10 @@ app.set('view engine', 'handlebars');
 /* ROUTING */
 app.get('/', index.setup);
 app.get('/getnewsong', index.getnewsong);
+app.get('/getnsongs', index.getnsongs);
 app.get('/game', index.game);
 app.get('/getConfig', index.getConfig);
+app.get('/reset', index.reset);
 app.post('/updateConfig', index.updateConfig);
 
 app.listen(process.env.PORT || 3000);

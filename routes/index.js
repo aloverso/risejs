@@ -4,7 +4,20 @@ var fs = require('fs');
 var mm = require('musicmetadata');
 var allsongs = require('../allsongsnew.json');
 
+var defaultconfig = {
+	"gameplay": 0,
+    "songlen": 10,
+    "numsongs": 10,
+    "albumart": 1,
+    "playtime":180
+};
+
 var config = {
+	"gameplay": 0,
+    "songlen": 10,
+    "numsongs": 10,
+    "albumart": 1,
+    "playtime":180
 };
 
 
@@ -46,7 +59,52 @@ routes.getnewsong = function(req,res) {
 	  });
 }
 
+routes.getnsongs = function(req,res) {
+	// create a new parser from a node ReadStream
+
+	var n = req.query.n;
+
+	console.log(n);
+
+	var finalsongs = [];
+	var songtitles = [];
+	var songslist = allsongs.songs;
+
+	for (var i=0; i<n; i++) {
+		var index = 1;
+		var randsong;
+		while (index >= 0) {
+			console.log(index);
+			var randi = Math.floor(songslist.length * Math.random());
+			randsong = makeJson(songslist[randi]);
+			index = songtitles.indexOf(randsong.title);
+		}
+		console.log(index);
+		finalsongs.push(randsong);
+		songtitles.push(randsong.title);
+		// console.log(finalsongs);
+	}
+
+	function makeJson(randsong) {
+		return {
+		  	'title':randsong.title,
+		  	'album':randsong.album,
+		  	'path':randsong.url,
+		  	'duration':randsong.duration,
+		  	'startTime':Math.floor((randsong.duration-25) * Math.random()),
+		  	'guess':false
+		  };
+	}
+
+	res.json(finalsongs);
+}
+
 routes.getConfig = function(req, res) {
+	res.json(config);
+}
+
+routes.reset = function(req, res) {
+	config = defaultconfig;
 	res.json(config);
 }
 

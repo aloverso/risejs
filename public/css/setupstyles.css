@@ -1,14 +1,31 @@
-.active {
-    background-color: #0E6FED;
-    color: #fff;
-}
-
 .row {
-    margin: 10px;
+    margin: 15px;
 }
 
 .result {
     font-size: 28px;
+}
+
+.headbar {
+    background-color: black;
+    color: white;
+    padding: 10px;
+    height: 40px;
+}
+
+.headimage {
+    max-height: 100%;
+    width: auto;
+}
+
+.title1 {
+    color: #555;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 38px;
+    letter-spacing: .1rem;
+    text-transform: uppercase;
+    text-decoration: none;
 }
 
 .onoffswitch {

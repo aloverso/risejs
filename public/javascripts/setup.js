@@ -2,16 +2,32 @@
 
 // console.log(CONFIG);
 
+var CONFIG;
 
-var CONFIG = {
-    "gameplay": 0,
-    "songlen": 5,
-    "numsongs": 10,
-    "albumart": 1,
-    "playtime":180
-};
+var savedPlaytime;
 
-$.post('/updateConfig',CONFIG).success();
+$.get('/getConfig').done(function(data) {
+	CONFIG = data;
+	$('#numsongs-res').text(CONFIG.numsongs);
+	$('#numsongs').val(CONFIG.numsongs);
+	$('#songlen-res').text(CONFIG.songlen);
+	$('#songlen').val(CONFIG.songlen);
+	$('#playtime-res').text(CONFIG.playtime);
+	$('#playtime').val(CONFIG.playtime);
+	$('#myonoffswitch')[0].checked = CONFIG.albumart ? true : false;
+
+	if (CONFIG.playtime===0) {
+		savedPlaytime = 180;
+	} else {
+		savedPlaytime = CONFIG.playtime;
+	}
+
+	if (CONFIG.gameplay===1) {
+		fixedtime();
+	} else {
+		fixednum();
+	}
+});
 
 function formatSecString(secs) {
 	    var mins = Math.floor(secs/60);
@@ -22,11 +38,13 @@ function formatSecString(secs) {
 function fixedtime() {
 	CONFIG.gameplay = 1;
 	console.log(CONFIG);
-	$('#fixedtime').attr('class','active');
-	$('#fixednum').removeClass('active');
+	$('#fixedtime').attr('class','button-primary');
+	$('#fixednum').removeClass('button-primary');
 
 	$('#allotted').css('display', 'block');
-	$('#playtime-res').text(formatSecString(180));
+	$('#playtime').val(savedPlaytime);
+	$('#playtime-res').text(formatSecString(savedPlaytime));
+	CONFIG.playtime = savedPlaytime;
 
 	return false;
 }
@@ -34,8 +52,10 @@ function fixedtime() {
 function fixednum () {
 	CONFIG.gameplay = 0;
 	console.log(CONFIG);
-	$('#fixednum').attr('class','active');
-	$('#fixedtime').removeClass('active');
+	$('#fixednum').attr('class','button-primary');
+	$('#fixedtime').removeClass('button-primary');
+	CONFIG.playtime = 0;
+	$('#allotted').css('display', 'none');
 
 	return false;
 }
@@ -47,6 +67,31 @@ function startgame() {
 	$.post('/updateConfig', CONFIG).success(
 		$(location).attr('href', '/game')
 	);
+}
+
+function reset() {
+	$.get('/reset').done(function(data) {
+		CONFIG = data;
+		$('#numsongs-res').text(CONFIG.numsongs);
+		$('#numsongs').val(CONFIG.numsongs);
+		$('#songlen-res').text(CONFIG.songlen);
+		$('#songlen').val(CONFIG.songlen);
+		$('#playtime-res').text(CONFIG.playtime);
+		$('#playtime').val(CONFIG.playtime);
+		$('#myonoffswitch')[0].checked = CONFIG.albumart ? true : false;
+
+		if (CONFIG.playtime===0) {
+			savedPlaytime = 180;
+		} else {
+			savedPlaytime = CONFIG.playtime;
+		}
+
+		if (CONFIG.gameplay===1) {
+			fixedtime();
+		} else {
+			fixednum();
+		}
+	});
 }
 
 $('#myonoffswitch').change(function() {
@@ -71,6 +116,9 @@ $('input').on('input', function () {
 	
 	if($(this).attr('id') === 'playtime') {
 		$('#'+$(this).attr('id')+"-res").text(formatSecString(parseInt($(this).val())));
+		savedPlaytime = CONFIG.playtime;
+	} else if($(this).attr('id') === 'songlen') {
+		$('#'+$(this).attr('id')+"-res").text($(this).val() + " sec");
 	} else {
 		$('#'+$(this).attr('id')+"-res").text($(this).val());
 	}
