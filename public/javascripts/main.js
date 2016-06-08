@@ -60,13 +60,10 @@ function Container(gameplay, numsongs, songlen, albumart, playtime) {
 		// make sure we don't have song repeats
 		$.get("getnsongs", {n:numsongs})
 		.done(function(data) {
-			console.log(data.length);
 
 			for (var i=0; i<numsongs; i++) {
-				console.log(data[i]);
 				songs.push(data[i]);
 			}
-			console.log(songs);
 		});	
 
 			
@@ -124,7 +121,6 @@ function Container(gameplay, numsongs, songlen, albumart, playtime) {
 				if ((start || notplaying) && songs.length === numsongs) {
 
 					if (start) {
-						console.log("FUCK");
 						for (var i=0; i<numsongs; i++) {
 							var audioElement = document.createElement('audio');
 							audioElement.setAttribute('src', songs[i].path);
@@ -132,23 +128,22 @@ function Container(gameplay, numsongs, songlen, albumart, playtime) {
 							audioElement.load();
 							audioElement.setAttribute('id',songs[i].title)
 							audioElement.preload = "auto";
-							console.log(audioElement);
 							audioElement.added = false;
 							audioElement.oncanplaythrough = function() {
 								if (canplay.indexOf(this) < 0 && !this.added && !gameEnded()) {
-									console.log("woott");
+									// console.log("woott");
 									canplay.push(this);
-									console.log("woottt");
+									// console.log("woottt");
 									t = this.getAttribute('id');
-									console.log("woot"+t);
+									// console.log("woot"+t);
 									for (var j=0; j<numsongs; j++) {
 										if (songs[j].title === t) {
 											songsplay.push(songs[j]);
-											console.log("woot2"+t);
+											// console.log("woot2"+t);
 											break;
 										}
 									}
-									console.log("woot3"+t);
+									// console.log("woot3"+t);
 									$('#loading').remove();
 									$('#status').append("<div class='status-box clickable' id='"+t.hashCode()+"' onclick='c.jumpsong("+(canplay.indexOf(this))+")'>"+(canplay.indexOf(this)+1)+"</div>");
 									if (canplay.length < numsongs) {
@@ -163,7 +158,7 @@ function Container(gameplay, numsongs, songlen, albumart, playtime) {
 					}
 
 					if (canplay.length > 0) {
-						console.log(canplay);
+						// console.log(canplay);
 						currentSong = songsplay[0];
 						canplay[0].currentTime = currentSong.startTime;
 						if(albumart) {
@@ -181,7 +176,7 @@ function Container(gameplay, numsongs, songlen, albumart, playtime) {
 
 		timerint = setInterval(function() {
 			// gameplay = 1, time decreasing
-			if (gameplay && !notplaying) {
+			if (gameplay && !notplaying && !ended) {
 				timesecs -= 1;
 				if (timesecs <= 15) {
 					$('#timer').css('color','#fe2c3b');
@@ -229,6 +224,8 @@ function Container(gameplay, numsongs, songlen, albumart, playtime) {
 	}
 
 	function pausesong() {
+
+		
 		canplay[counter].pause();
 	}
 
@@ -313,9 +310,7 @@ function Container(gameplay, numsongs, songlen, albumart, playtime) {
 			if (guesses < 0) guesses=1;
 			else guesses+=1;
 
-			console.log(currentSong.title, strip(currentSong.title), typeof(currentSong.title));
 			if (amendguess(strip(guess)) === strip(currentSong.title)) {
-				console.log(amendguess(strip(guess)), strip(currentSong.title));
 				score += 1;
 				$('#score').html("Score: "+score);
 				$('#'+currentSong.title.hashCode()).html("<i class='fa fa-check-circle'></i> "+currentSong.title);
@@ -336,15 +331,12 @@ var CONFIG;
 
 $.get('/getConfig').done(function(data) {
 	CONFIG = data;
-	console.log(typeof(CONFIG.gameplay));
 
 	// FIXED NUMBER OF SONGS
 	// if (CONFIG.gameplay === 0) {
-	console.log('waht');
 	c = new Container(CONFIG.gameplay, CONFIG.numsongs, CONFIG.songlen, CONFIG.albumart, CONFIG.playtime);
 
 	c.setgame();
-	console.log(c);
 	// }
 });
 

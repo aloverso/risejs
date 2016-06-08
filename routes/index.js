@@ -5,7 +5,7 @@ var mm = require('musicmetadata');
 var allsongs = require('../allsongsnew.json');
 
 var defaultconfig = {
-	"gameplay": 0,
+	"gameplay": 1,
     "songlen": 10,
     "numsongs": 10,
     "albumart": 1,
@@ -13,7 +13,7 @@ var defaultconfig = {
 };
 
 var config = {
-	"gameplay": 0,
+	"gameplay": 1,
     "songlen": 10,
     "numsongs": 10,
     "albumart": 1,
