@@ -94,9 +94,9 @@ function Container() {
 			audioElement.oncanplaythrough = function() {
 				console.log("asfdasdf");
 				console.log(canplay.indexOf(this));
-				console.log(this.added);
-				console.log(gameEnded());
-				console.log(this);
+				//console.log(this.added);
+				//console.log(gameEnded());
+				//console.log(this);
 				if (canplay.indexOf(this) < 0 && !this.added && !gameEnded()) {
 					canplay.push(this);
 					t = this.getAttribute('id');
@@ -115,7 +115,7 @@ function Container() {
 				}
 			}
 			loads.push(audioElement);
-			console.log(loads);
+			//console.log(loads);
 		}
 	}
 
