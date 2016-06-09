@@ -92,25 +92,30 @@ function Container() {
 			audioElement.preload = "auto";
 			audioElement.added = false;
 			audioElement.oncanplaythrough = function() {
-				if (canplay.indexOf(this) < 0 && !this.added && !gameEnded() && canplay.length < getNumSongs()) {
+				console.log("asfdasdf");
+				console.log(canplay.indexOf(this));
+				console.log(this.added);
+				console.log(gameEnded());
+				console.log(this);
+				if (canplay.indexOf(this) < 0 && !this.added && !gameEnded()) {
 					canplay.push(this);
 					t = this.getAttribute('id');
 
 					// find the actual song json object to push
 					for (var j=0; j<num; j++) {
-						if (songs[j].title === t && songsplay.length<getNumSongs()) {
+						if (songs[j].title === t) {
 							songsplay.push(songs[j]);
 							//console.log("woot2"+t);
+							console.log("woot3");
+							this.added = true;
 							break;
 						}
 					}
-					console.log("woot3");
 					
-					this.added = true;
 				}
 			}
 			loads.push(audioElement);
-			//console.log(loads);
+			console.log(loads);
 		}
 	}
 
@@ -209,7 +214,7 @@ function Container() {
 
 
 			// if guessed all (loaded) songs
-			if (guesses >= songsplay.length) {
+			if (guesses >= canplay.length) {
 				ended = true;
 				pausesong();
 				$('#interaction-unit').css('display', 'none');
@@ -310,7 +315,7 @@ function Container() {
 		$('#interaction-unit').css('display', 'none');
 		$('#loading').remove();
 
-		for(var i=0; i<songsplay.length; i++) {
+		for(var i=0; i<canplay.length; i++) {
 			var s = songsplay[i];
 			if (!s.guess) {
 				s.guess = true;
@@ -590,7 +595,7 @@ function SETUP() {
 
 	$('input').on('input', function () {
 		console.log("WKASLFD");
-		CONFIG[$(this).attr('id')] = $(this).val();
+		CONFIG[$(this).attr('id')] = parseInt($(this).val());
 		
 		if($(this).attr('id') === 'playtime') {
 			$('#'+$(this).attr('id')+"-res").text(formatSecString(parseInt($(this).val())));
