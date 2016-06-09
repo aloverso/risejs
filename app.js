@@ -37,7 +37,7 @@ app.use(favicon(__dirname + '/public/images/favicon.ico'));
 // }));
 
 /* ROUTING */
-app.get('/', index.setup);
+app.get('/', index.game);
 app.get('/getnewsong', index.getnewsong);
 app.get('/getnsongs', index.getnsongs);
 app.get('/game', index.game);

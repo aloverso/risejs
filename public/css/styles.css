@@ -77,3 +77,6 @@ img#albumart {
 	float: right;
 }
 
+#loadingholder {
+	position: relative;
+}

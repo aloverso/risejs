@@ -4,22 +4,6 @@ var fs = require('fs');
 var mm = require('musicmetadata');
 var allsongs = require('../allsongsnew.json');
 
-var defaultconfig = {
-	"gameplay": 1,
-    "songlen": 10,
-    "numsongs": 10,
-    "albumart": 1,
-    "playtime":180
-};
-
-var config = {
-	"gameplay": 1,
-    "songlen": 10,
-    "numsongs": 10,
-    "albumart": 1,
-    "playtime":180
-};
-
 
 String.prototype.hashCode = function() {
   var hash = 0, i, chr, len;
@@ -100,7 +84,7 @@ routes.getnsongs = function(req,res) {
 }
 
 routes.getConfig = function(req, res) {
-	res.json(config);
+	// res.json(config);
 }
 
 routes.reset = function(req, res) {
@@ -109,11 +93,11 @@ routes.reset = function(req, res) {
 }
 
 routes.updateConfig = function(req, res) {
-	var p = {};
-	for (var key in req.body) {
-	    p[key] = parseInt(req.body[key]);
-	}
-	config=p;
+	// var p = {};
+	// for (var key in req.body) {
+	//     p[key] = parseInt(req.body[key]);
+	// }
+	// config=p;
 }
 
 	// var parser = mm(fs.createReadStream('public/audios/ra'+randsong.hashCode()+'.mp3'), { duration: true }, function (err, metadata) {

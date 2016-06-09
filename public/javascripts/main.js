@@ -9,27 +9,44 @@ String.prototype.hashCode = function() {
   return this.charAt(0) + parseInt(Math.abs(hash));
 };
 
-function Container(gameplay, numsongs, songlen, albumart, playtime) {
+var defaultconfig = {
+	"gameplay": 1,
+    "songlen": 10,
+    "numsongs": 10,
+    "albumart": 1,
+    "playtime":180
+};
+
+var CONFIG = {
+	"gameplay": 1,
+    "songlen": 10,
+    "numsongs": 10,
+    "albumart": 1,
+    "playtime":180
+};
+
+function getNumSongs() {
+	return CONFIG.numsongs;
+}
+
+function Container() {
 
 	var currentSong;
-	var songs = [];
+	var songs = []; // contains loading song objects
 	var counter = 0;
 	var start = true;
 	var notplaying = true;
-	var timesecs = playtime;
+	var timesecs = CONFIG.playtime;
 	var score = 0;
-	var songlen = songlen;
-	var numsongs = numsongs;
-	var albumart = albumart;
 	var ended = false;
 
 	var timerint;
 	var songcheckint;
 
-	var loads = [];
+	var loads = []; // contains loading audio elements
 
-	var canplay = [];
-	var songsplay = [];
+	var canplay = []; // contains loaded audio elements
+	var songsplay = []; // contains loaded song objects
 	var guesses = -1;
 
 	this.setgame = setgame;
@@ -40,6 +57,12 @@ function Container(gameplay, numsongs, songlen, albumart, playtime) {
 	this.jumpsong = jumpsong;
 	this.checkGuess = checkGuess;
 	this.giveup = giveup
+	this.settime = settime;
+	this.STARTLOADING = STARTLOADING;
+
+	function settime(time) {
+		timesecs = time;
+	}
 
 	function gameEnded() {
 		return ended;
@@ -55,16 +78,73 @@ function Container(gameplay, numsongs, songlen, albumart, playtime) {
 		songs.push(song);
 	}
 
+	function STARTLOADING(num) {
+		GETNSONGS(num);
+	}
+
+	function onGotSongs(num) {
+		for (var i=0; i<num; i++) {
+			var audioElement = document.createElement('audio');
+			audioElement.setAttribute('src', songs[i].path);
+			audioElement.currentTime = songs[i].startTime;
+			audioElement.load();
+			audioElement.setAttribute('id',songs[i].title)
+			audioElement.preload = "auto";
+			audioElement.added = false;
+			audioElement.oncanplaythrough = function() {
+				if (canplay.indexOf(this) < 0 && !this.added && !gameEnded() && canplay.length < getNumSongs()) {
+					canplay.push(this);
+					t = this.getAttribute('id');
+
+					// find the actual song json object to push
+					for (var j=0; j<num; j++) {
+						if (songs[j].title === t && songsplay.length<getNumSongs()) {
+							songsplay.push(songs[j]);
+							//console.log("woot2"+t);
+							break;
+						}
+					}
+					console.log("woot3");
+					
+					this.added = true;
+				}
+			}
+			loads.push(audioElement);
+			//console.log(loads);
+		}
+	}
+
+	function GETNSONGS(num) {
+		$.get("getnsongs", {n:num})
+		.done(function(data) {
+
+			for (var i=0; i<num; i++) {
+				songs.push(data[i]);
+			}
+			onGotSongs(num);
+		});
+	}
+
 	function setgame() {
 
 		// make sure we don't have song repeats
-		$.get("getnsongs", {n:numsongs})
-		.done(function(data) {
+		
+		//console.log("DLSKFLKJ");
+		$('#interaction-unit').css('display', 'block');
+		$('#score').html("Score: "+score);
 
-			for (var i=0; i<numsongs; i++) {
-				songs.push(data[i]);
+		canplay.splice(CONFIG.numsongs, 25);
+
+		for (var i=0; i<canplay.length; i++) {
+			var t = canplay[i].getAttribute('id');
+			//console.log(t);
+			$('#loading').remove();
+			$('#statusholder').append("<div class='status-box clickable' id='"+t.hashCode()+"' onclick='c.jumpsong("+i+")'>"+(i+1)+"</div>");
+			
+			if (canplay.length < CONFIG.numsongs) {
+				$('#loadingholder').append("<div id='loading'>LOADING...</div>");
 			}
-		});	
+		}
 
 			
 		// 	data.startTime = Math.floor((data.duration-15) * Math.random());
@@ -99,69 +179,98 @@ function Container(gameplay, numsongs, songlen, albumart, playtime) {
 		// 		}
 		// 	});
 		// }
-		
+
+
 
 		songcheckint = setInterval(function() {
 			if (currentSong) {
-				if (canplay[counter].currentTime >= currentSong.startTime + songlen) {
+				if (canplay[counter].currentTime >= currentSong.startTime + parseInt(CONFIG.songlen)) {
 					canplay[counter].currentTime = currentSong.startTime;
 				}
 			}
 
+			//console.log(canplay.length);
+			//console.log($('#statusholder').children().length);
+
+			if (canplay.length > $('#statusholder').children().length) {
+				for (var i=($('#statusholder').children().length); i<canplay.length; i++) {
+
+					var t = canplay[i].getAttribute('id');
+					//console.log(t);
+					$('#loading').remove();
+					$('#statusholder').append("<div class='status-box clickable' id='"+t.hashCode()+"' onclick='c.jumpsong("+i+")'>"+(i+1)+"</div>");
+					
+					if (i+1 < CONFIG.numsongs) {
+						//console.log('holla'+i);
+						$('#loadingholder').append("<div id='loading'>LOADING...</div>");
+					}
+				}
+			}
+
+
 			// if guessed all (loaded) songs
 			if (guesses >= songsplay.length) {
 				ended = true;
-				canplay[0].pause();
+				pausesong();
 				$('#interaction-unit').css('display', 'none');
 				$('#loading').remove();
 			}
 
 				// first time
 				//**********************
-				if ((start || notplaying) && songs.length === numsongs) {
+				if ((start || notplaying) && songs.length >= CONFIG.numsongs) {
 
 					if (start) {
-						for (var i=0; i<numsongs; i++) {
-							var audioElement = document.createElement('audio');
-							audioElement.setAttribute('src', songs[i].path);
-							audioElement.currentTime = songs[i].startTime;
-							audioElement.load();
-							audioElement.setAttribute('id',songs[i].title)
-							audioElement.preload = "auto";
-							audioElement.added = false;
-							audioElement.oncanplaythrough = function() {
-								if (canplay.indexOf(this) < 0 && !this.added && !gameEnded()) {
-									// console.log("woott");
-									canplay.push(this);
-									// console.log("woottt");
-									t = this.getAttribute('id');
-									// console.log("woot"+t);
-									for (var j=0; j<numsongs; j++) {
-										if (songs[j].title === t) {
-											songsplay.push(songs[j]);
-											// console.log("woot2"+t);
-											break;
-										}
-									}
-									// console.log("woot3"+t);
-									$('#loading').remove();
-									$('#status').append("<div class='status-box clickable' id='"+t.hashCode()+"' onclick='c.jumpsong("+(canplay.indexOf(this))+")'>"+(canplay.indexOf(this)+1)+"</div>");
-									if (canplay.length < numsongs) {
-										$('#status').append("<div id='loading'>LOADING...</div>");
-									}
-									this.added = true;
-								}
-							}
-							loads.push(audioElement);
-						}
-						start = false;
+
+						// for (var i=0; i<CONFIG.numsongs; i++) {
+							
+						// }
+
+						
+
+						// for (var i=0; i<numsongs; i++) {
+						// 	console.log("aksdf");
+						// 	var audioElement = document.createElement('audio');
+						// 	audioElement.setAttribute('src', songs[i].path);
+						// 	audioElement.currentTime = songs[i].startTime;
+						// 	audioElement.load();
+						// 	audioElement.setAttribute('id',songs[i].title)
+						// 	audioElement.preload = "auto";
+						// 	audioElement.added = false;
+						// 	audioElement.oncanplaythrough = function() {
+						// 		if (canplay.indexOf(this) < 0 && !this.added && !gameEnded()) {
+						// 			console.log("woott");
+						// 			canplay.push(this);
+						// 			console.log("woottt");
+						// 			t = this.getAttribute('id');
+						// 			console.log("woot"+t);
+						// 			for (var j=0; j<numsongs; j++) {
+						// 				if (songs[j].title === t) {
+						// 					songsplay.push(songs[j]);
+						// 					console.log("woot2"+t);
+						// 					break;
+						// 				}
+						// 			}
+						// 			console.log("woot3"+t);
+						// 			$('#loading').remove();
+						// 			$('#status').append("<div class='status-box clickable' id='"+t.hashCode()+"' onclick='c.jumpsong("+(canplay.indexOf(this))+")'>"+(canplay.indexOf(this)+1)+"</div>");
+						// 			if (canplay.length < numsongs) {
+						// 				$('#status').append("<div id='loading'>LOADING...</div>");
+						// 			}
+						// 			this.added = true;
+						// 		}
+						// 	}
+						// 	loads.push(audioElement);
+						// 	console.log(loads);
+						// }
+						// start = false;
 					}
 
 					if (canplay.length > 0) {
 						// console.log(canplay);
 						currentSong = songsplay[0];
 						canplay[0].currentTime = currentSong.startTime;
-						if(albumart) {
+						if(CONFIG.albumart) {
 							$('#albumart').attr('src', 'images/'+currentSong.album+'.jpg');
 						} else {
 							$('#albumart').attr('src', 'images/noart.jpg');
@@ -169,6 +278,7 @@ function Container(gameplay, numsongs, songlen, albumart, playtime) {
 						$('#'+currentSong.title.hashCode()).css('border', '3px solid #333');
 						canplay[0].play();
 						notplaying = false;
+						start = false;
 					}
 
 				}
@@ -176,7 +286,7 @@ function Container(gameplay, numsongs, songlen, albumart, playtime) {
 
 		timerint = setInterval(function() {
 			// gameplay = 1, time decreasing
-			if (gameplay && !notplaying && !ended) {
+			if (CONFIG.gameplay && !notplaying && !ended) {
 				timesecs -= 1;
 				if (timesecs <= 15) {
 					$('#timer').css('color','#fe2c3b');
@@ -224,8 +334,6 @@ function Container(gameplay, numsongs, songlen, albumart, playtime) {
 	}
 
 	function pausesong() {
-
-		
 		canplay[counter].pause();
 	}
 
@@ -258,13 +366,13 @@ function Container(gameplay, numsongs, songlen, albumart, playtime) {
 			$('#'+currentSong.title.hashCode()).css('border', '0px solid #333');
 			currentSong = song;
 			$('#'+currentSong.title.hashCode()).css('border', '3px solid #333');
-			if (albumart) {
+			if (CONFIG.albumart) {
 				$('#albumart').attr('src', '');
 			}
 		
 			canplay[counter].currentTime = currentSong.startTime;
 			canplay[counter].play();
-			if (albumart) {
+			if (CONFIG.albumart) {
 				$('#albumart').attr('src', 'images/'+currentSong.album+'.jpg');
 			}
 			$('#playpauser').attr('class', 'fa fa-pause-circle-o fa-5x');
@@ -272,7 +380,20 @@ function Container(gameplay, numsongs, songlen, albumart, playtime) {
 	}
 
 	function newgame() {
-		location.reload();
+		$('#GAME').css('display','none');
+		$('#SETUP').css('display','block');
+		ended = true;
+		pausesong();
+	 	$('#statusholder').html("");
+	 	$('#loadingholder').html("");
+	 	$('#timer').html("");
+	 	$('#score').html("");
+		clearInterval(timerint);
+		clearInterval(songcheckint);
+		for (var i=0; i<loads.length; i++) {
+			loads[i].setAttribute('src','');
+		}
+		SETUP();
 	}
 
 	function formatSecString(secs) {
@@ -326,21 +447,23 @@ function Container(gameplay, numsongs, songlen, albumart, playtime) {
 	}
 }
 
-var c;
-var CONFIG;
+var c = null;
+var savedPlaytime;
 
-$.get('/getConfig').done(function(data) {
-	CONFIG = data;
 
-	// FIXED NUMBER OF SONGS
-	// if (CONFIG.gameplay === 0) {
-	c = new Container(CONFIG.gameplay, CONFIG.numsongs, CONFIG.songlen, CONFIG.albumart, CONFIG.playtime);
+function GAME() {
 
-	c.setgame();
-	// }
-});
+	// $.get('/getConfig').done(function(data) {
 
-var $guessForm = $('form.guessform').unbind();
+		// FIXED NUMBER OF SONGS
+		// if (CONFIG.gameplay === 0) {
+		c.settime(CONFIG.playtime);
+		c.setgame();
+		// }
+	// });
+
+	var $guessForm = $('form.guessform').unbind();
+}
 
 function submitGuess() {
 	event.preventDefault();
@@ -351,7 +474,134 @@ function submitGuess() {
 	return false;
 };
 
-function restart() {
-	$(location).attr('href', '/')
+function formatSecString(secs) {
+	    var mins = Math.floor(secs/60);
+	    var se = Math.floor(secs % 60);
+	    return mins+"m"+se+"s";
+	}
+
+function fixedtime() {
+	CONFIG.gameplay = 1;
+	//console.log(CONFIG);
+	$('#fixedtime').attr('class','button-primary');
+	$('#fixednum').removeClass('button-primary');
+
+	$('#allotted').css('display', 'block');
+	$('#playtime').val(savedPlaytime);
+	$('#playtime-res').text(formatSecString(savedPlaytime));
+	CONFIG.playtime = savedPlaytime;
+
+	return false;
 }
 
+function fixednum () {
+	CONFIG.gameplay = 0;
+	//console.log(CONFIG);
+	$('#fixednum').attr('class','button-primary');
+	$('#fixedtime').removeClass('button-primary');
+	CONFIG.playtime = 0;
+	$('#allotted').css('display', 'none');
+
+	return false;
+}
+
+function startgame() {
+	// localStorage.setItem("conf", JSON.stringify(CONFIG));
+	// console.log(JSON.parse(localStorage.getItem("conf")));
+	// console.log(CONFIG);
+	// $.post('/updateConfig', CONFIG).success(
+	// 	$(location).attr('href', '/game')
+	// );
+	$('#SETUP').css('display','none');
+	$('#GAME').css('display','block');
+	
+	GAME();
+}
+
+function reset() {
+	// $.get('/reset').done(function(data) {
+		CONFIG = defaultconfig;
+		$('#numsongs-res').text(CONFIG.numsongs);
+		$('#numsongs').val(CONFIG.numsongs);
+		$('#songlen-res').text(CONFIG.songlen);
+		$('#songlen').val(CONFIG.songlen);
+		$('#playtime-res').text(CONFIG.playtime);
+		$('#playtime').val(CONFIG.playtime);
+		$('#myonoffswitch')[0].checked = CONFIG.albumart ? true : false;
+
+		if (CONFIG.playtime===0) {
+			savedPlaytime = 180;
+		} else {
+			savedPlaytime = CONFIG.playtime;
+		}
+
+		if (CONFIG.gameplay===1) {
+			fixedtime();
+		} else {
+			fixednum();
+		}
+	// });
+}
+
+function SETUP() {
+
+	c = null;
+	c = new Container();
+	c.STARTLOADING(25);
+
+	// $.get('/getConfig').done(function(data) {
+	// 	CONFIG = data;
+		$('#numsongs-res').text(CONFIG.numsongs);
+		$('#numsongs').val(CONFIG.numsongs);
+		$('#songlen-res').text(CONFIG.songlen);
+		$('#songlen').val(CONFIG.songlen);
+		$('#playtime-res').text(CONFIG.playtime);
+		$('#playtime').val(CONFIG.playtime);
+		//console.log($('#myonoffswitch')[0]);
+		$('#myonoffswitch')[0].checked = CONFIG.albumart ? true : false;
+
+		if (CONFIG.playtime===0) {
+			savedPlaytime = 180;
+		} else {
+			savedPlaytime = CONFIG.playtime;
+		}
+
+		if (CONFIG.gameplay===1) {
+			fixedtime();
+		} else {
+			fixednum();
+		}
+	// });
+
+
+	$('#myonoffswitch').change(function() {
+		//console.log("HOLLA");
+		if(this.checked) {
+			CONFIG.albumart = 1;
+		} else {
+			CONFIG.albumart = 0;
+		}
+	});
+
+	// Initialize a new plugin instance for all
+	// e.g. $('input[type="range"]') elements.
+
+    $('input[type="range"]').rangeslider();
+
+	$('input').on('input', function () {
+		console.log("WKASLFD");
+		CONFIG[$(this).attr('id')] = $(this).val();
+		
+		if($(this).attr('id') === 'playtime') {
+			$('#'+$(this).attr('id')+"-res").text(formatSecString(parseInt($(this).val())));
+			savedPlaytime = CONFIG.playtime;
+		} else if($(this).attr('id') === 'songlen') {
+			$('#'+$(this).attr('id')+"-res").text($(this).val() + " sec");
+		} else {
+			$('#'+$(this).attr('id')+"-res").text($(this).val());
+		}
+	});
+
+}
+
+SETUP();
