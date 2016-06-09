@@ -135,8 +135,10 @@ function Container() {
 		// make sure we don't have song repeats
 		
 		//console.log("DLSKFLKJ");
+		$('#giveup-button').css('display', 'inline');
 		$('#interaction-unit').css('display', 'block');
 		$('#score').html("Score: "+score);
+		$('#timer').css('color','#000');
 
 		canplay.splice(CONFIG.numsongs, 25);
 
@@ -316,6 +318,7 @@ function Container() {
 		canplay[counter].pause();
 		$('#interaction-unit').css('display', 'none');
 		$('#loading').remove();
+		$('#giveup-button').css('display', 'none');
 
 		for(var i=0; i<canplay.length; i++) {
 			var s = songsplay[i];
@@ -431,6 +434,9 @@ function Container() {
 			case "hollis brown":
 				return "ballad of hollis brown";
 				break;
+			case "ghost of tom joad":
+				return "the ghost of tom joad";
+				break;	
 			default:
 				return stripped;
 		}
