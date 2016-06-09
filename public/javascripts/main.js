@@ -197,6 +197,8 @@ function Container() {
 			//console.log(canplay.length);
 			//console.log($('#statusholder').children().length);
 
+			canplay.splice(CONFIG.numsongs, 25);
+
 			if (canplay.length > $('#statusholder').children().length) {
 				for (var i=($('#statusholder').children().length); i<canplay.length; i++) {
 
@@ -424,6 +426,10 @@ function Container() {
 				break;
 			case "collapse":
 				return "collapse post amerika";
+				break;
+			case "the ballad of hollis brown":
+			case "hollis brown":
+				return "ballad of hollis brown";
 				break;
 			default:
 				return stripped;
