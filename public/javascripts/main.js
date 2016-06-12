@@ -139,6 +139,7 @@ function Container() {
 		$('#interaction-unit').css('display', 'block');
 		$('#score').html("Score: "+score);
 		$('#timer').css('color','#000');
+		$('#playpauser').attr('class', 'fa fa-pause-circle-o fa-5x clickable');
 
 		canplay.splice(CONFIG.numsongs, 25);
 
@@ -291,7 +292,7 @@ function Container() {
 					}
 
 				}
-		}, 500);
+		}, 200);
 
 		timerint = setInterval(function() {
 			// gameplay = 1, time decreasing
