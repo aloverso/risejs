@@ -13,7 +13,7 @@ var index = require('./routes/index.js');
 var favicon = require('serve-favicon');
 
 /* CONNECT TO MONGOOSE */
-mongoose.connect(process.env.MONGOURI || 'mongodb://localhost/risejs');
+mongoose.connect(process.env.PROD_MONGODB || 'mongodb://localhost/risejs');
 
 
 /* CONFIG APP */
