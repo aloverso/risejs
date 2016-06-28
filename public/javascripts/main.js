@@ -14,7 +14,9 @@ var defaultconfig = {
     "songlen": 10,
     "numsongs": 10,
     "albumart": 1,
-    "playtime":180
+    "playtime":180,
+    "username":undefined,
+    "contestName":undefined
 };
 
 var CONFIG = {
@@ -22,8 +24,11 @@ var CONFIG = {
     "songlen": 10,
     "numsongs": 10,
     "albumart": 1,
-    "playtime":180
+    "playtime":180,
+    "username":undefined,
+    "contestName":undefined
 };
+
 
 function getNumSongs() {
 	return CONFIG.numsongs;
@@ -39,6 +44,7 @@ function Container() {
 	var timesecs = CONFIG.playtime;
 	var score = 0;
 	var ended = false;
+	var notsaved = true;
 
 	var timerint;
 	var songcheckint;
@@ -137,6 +143,7 @@ function Container() {
 		//console.log("DLSKFLKJ");
 		$('#giveup-button').css('display', 'inline');
 		$('#interaction-unit').css('display', 'block');
+		$('#contest-message').html('');
 		$('#score').html("Score: "+score);
 		$('#timer').css('color','#000');
 		$('#playpauser').attr('class', 'fa fa-pause-circle-o fa-5x clickable');
@@ -220,10 +227,11 @@ function Container() {
 
 			// if guessed all (loaded) songs
 			if (guesses >= canplay.length) {
-				ended = true;
-				pausesong();
-				$('#interaction-unit').css('display', 'none');
-				$('#loading').remove();
+				// ended = true;
+				// pausesong();
+				// $('#interaction-unit').css('display', 'none');
+				// $('#loading').remove();
+				revealanswers();
 			}
 
 				// first time
@@ -316,7 +324,7 @@ function Container() {
 	}
 
 	function revealanswers() {
-		canplay[counter].pause();
+		pausesong();
 		$('#interaction-unit').css('display', 'none');
 		$('#loading').remove();
 		$('#giveup-button').css('display', 'none');
@@ -331,6 +339,32 @@ function Container() {
 		}
 
 		ended = true;
+
+		console.log(CONFIG.contestName, CONFIG.username, notsaved);
+		if (CONFIG.contestName && CONFIG.username && notsaved) {
+			console.log("in it");
+			$.post('/saveEntry', {
+				'name': CONFIG.username,
+				'contest': CONFIG.contestName,
+				'score': score,
+				'timesecs': CONFIG.playtime - timesecs 
+			}).success(function(data) {
+				console.log(data);
+				notsaved = false;
+				$('#contest-message').html(makeContestMessage(data.place, data.total));
+			});
+		}
+	}
+
+	function makeContestMessage(place, total) {
+		var message = 'Congrats! You placed at number ' 
+		+ place + ' of ' + total
+		+ ' in the "' + CONFIG.contestName + '" contest!';
+		if (place <= 10) {
+			message += '\nCheck the leaderboard to see your entry!';
+		}
+		return '<div class="contestmessage"><span class="lefticon"><i class="lefticon fa fa-trophy fa-4x"></i></span><span>'
+		+message+'</span></div>';
 	}
 
 	function playpause() {
@@ -393,12 +427,17 @@ function Container() {
 	function newgame() {
 		$('#GAME').css('display','none');
 		$('#SETUP').css('display','block');
+		CONFIG.username = undefined;
+		CONFIG.contestName = undefined;
 		ended = true;
+		notsaved = true;
 		pausesong();
 	 	$('#statusholder').html("");
 	 	$('#loadingholder').html("");
 	 	$('#timer').html("");
 	 	$('#score').html("");
+	 	$('#extreme').html('<li class="headerrow"><span class="namespan">User</span><span class="timespan">Time</span><span class="scorespan">Score</span></li>');
+	 	$('#ordinary').html('<li class="headerrow"><span class="namespan">User</span><span class="timespan">Time</span><span class="scorespan">Score</span></li>');
 		clearInterval(timerint);
 		clearInterval(songcheckint);
 		for (var i=0; i<loads.length; i++) {
@@ -591,6 +630,9 @@ function SETUP() {
 		}
 	// });
 
+	populateContest('extreme');
+	populateContest('ordinary');
+
 
 	$('#myonoffswitch').change(function() {
 		//console.log("HOLLA");
@@ -620,6 +662,53 @@ function SETUP() {
 		}
 	});
 
+}
+
+function populateContest(id) {
+	$.get("/getEntries", {'contest': id, 'number': 10})
+  	.done(function(data) {
+  		console.log(data);
+  		$list = $('#'+id);
+  		for (var i=0; i<10; i++) {
+  			if(data[i])	$list.append(makeEntry(data[i].name, data[i].timesecs, data[i].score));
+  		}
+  	});
+}
+
+function makeEntry(name, time, score) {
+	return '<li class="entry">' 
+	    + '<span class="namespan">' + name + '</span>'
+		+ '<span class="timespan">' + time + '</span>'
+		+ '<span class="scorespan">' + score + '</span>'
+		+ '</li>';
+}
+
+function join(contest) {
+	var name = prompt("Enter a name for the leaderboard");
+	if (name) {
+		if (contest==="extreme") {
+			CONFIG = {
+				"gameplay": 1,
+			    "songlen": 1,
+			    "numsongs": 10,
+			    "albumart": 0,
+			    "playtime":60,
+			    "username":name.slice(0,25),
+			    "contestName":contest
+			};
+		} else if (contest==="ordinary") {
+			CONFIG = {
+				"gameplay": 1,
+			    "songlen": 5,
+			    "numsongs": 10,
+			    "albumart": 1,
+			    "playtime":180,
+			    "username":name.slice(0,25),
+			    "contestName":contest
+			};
+		}
+		startgame();
+	}
 }
 
 SETUP();

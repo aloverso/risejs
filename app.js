@@ -3,7 +3,7 @@
 var path = require('path');
 var express = require('express');
 var exphbs = require('express-handlebars');
-//var mongoose = require('mongoose');
+var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
@@ -13,7 +13,7 @@ var index = require('./routes/index.js');
 var favicon = require('serve-favicon');
 
 /* CONNECT TO MONGOOSE */
-//mongoose.connect(process.env.MONGOURI || 'mongodb://localhost/risejs');
+mongoose.connect(process.env.MONGOURI || 'mongodb://localhost/risejs');
 
 
 /* CONFIG APP */
@@ -44,6 +44,8 @@ app.get('/game', index.game);
 app.get('/getConfig', index.getConfig);
 app.get('/reset', index.reset);
 app.post('/updateConfig', index.updateConfig);
+app.post('/saveEntry', index.saveEntry);
+app.get('/getEntries', index.getEntries);
 
 app.listen(process.env.PORT || 3000);
 console.log("Running on port 3000");

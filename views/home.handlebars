@@ -80,6 +80,34 @@
 			<p>This game is free and fan-made, and not affiliated with Rise Against in any way.  With questions, comments, suggestions, bug reports, or concerns, please email the creator at anne[at]loverso[dot]org</p>
 		</div>
 	</div>
+
+	<hr>
+
+	<div class="row">
+		<h3>Contest Leaderboards</h3>
+		<div class="five columns">
+			<button class="button-primary" style="display:inline" onclick="join('extreme')">join</button>
+			<h4 style="display:inline">Extreme Mode</h4>
+			<ul id="extreme">
+				<li class="headerrow">
+					<span class="namespan">User</span>
+					<span class="timespan">Time</span>
+					<span class="scorespan">Score</span>
+				</li>
+			</ul>
+		</div>
+		<div class="five columns">
+			<button class="button-primary" style="display:inline" onclick="join('ordinary')">join</button>
+			<h4 style="display:inline">Ordinary Mode</h4>
+			<ul id="ordinary">
+				<li class="headerrow">
+					<span class="namespan">User</span>
+					<span class="timespan">Time</span>
+					<span class="scorespan">Score</span>
+				</li>
+			</ul>
+		</div>
+	</div>
 </div>
 
 <div class="container" style="margin-top: 40px; display: none;" id="GAME">
@@ -136,6 +164,8 @@
 					</div>
 				</div>
 			</div>
+
+			<div id="contest-message"></div>
 
 			<button id="giveup-button" onclick="c.giveup()">give up</button>
 			<button onclick="c.newgame()" class="button-primary">new game</button>

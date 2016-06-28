@@ -28,6 +28,43 @@
     text-decoration: none;
 }
 
+.entry {
+    background: #eee;
+    border-radius: 5px;
+    padding: 15px;
+    margin: 0px 5px 5px 5px;
+    justify-content: space-between;
+}
+
+.headerrow {
+    padding-left: 15px;
+    padding-right: 15px;
+    font-weight: bold;
+}
+
+.namespan {
+    float: left;
+    width: 60%;
+    word-wrap: break-word;
+}
+
+.timespan {
+    float: right;
+    width: 20%;
+    text-align: right;
+}
+
+.scorespan {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: right;
+    width: 19%;
+}
+
+li {
+    list-style: none;
+}
+
 .onoffswitch {
     position: relative; width: 90px;
     -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;

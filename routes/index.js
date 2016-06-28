@@ -3,7 +3,7 @@ var util = require('util');
 var fs = require('fs');
 var mm = require('musicmetadata');
 var allsongs = require('../allsongsnew.json');
-
+var Entry = require('./../models/entryModel.js');
 
 String.prototype.hashCode = function() {
   var hash = 0, i, chr, len;
@@ -34,7 +34,7 @@ routes.getnewsong = function(req,res) {
 	var songslist = allsongs.songs;
 	var randi = Math.floor(songslist.length * Math.random());
 	var randsong = songslist[randi];
-	console.log(randsong);
+	// console.log(randsong);
 	res.json({
 	  	'title':randsong.title,
 	  	'album':randsong.album,
@@ -48,7 +48,7 @@ routes.getnsongs = function(req,res) {
 
 	var n = req.query.n;
 
-	console.log(n);
+	// console.log(n);
 
 	var finalsongs = [];
 	var songtitles = [];
@@ -63,7 +63,7 @@ routes.getnsongs = function(req,res) {
 			randsong = makeJson(songslist[randi]);
 			index = songtitles.indexOf(randsong.title);
 		}
-		console.log(index);
+		// console.log(index);
 		finalsongs.push(randsong);
 		songtitles.push(randsong.title);
 		// console.log(finalsongs);
@@ -100,20 +100,72 @@ routes.updateConfig = function(req, res) {
 	// config=p;
 }
 
-	// var parser = mm(fs.createReadStream('public/audios/ra'+randsong.hashCode()+'.mp3'), { duration: true }, function (err, metadata) {
-	//   if (err) throw err;
-	//   console.log(metadata);
-	//   console.log(metadata.album);
-	//   console.log("\n");
+routes.saveEntry = function(req, res) {
+	var entry = {};
 
-	//   res.json({
-	//   	'title':randsong,
-	//   	'album':metadata.album,
-	//   	'path':'audios/ra'+randsong.hashCode()+'.mp3',
-	//   	'duration':metadata.duration
-	//   });
-	// });
+	entry.name = req.body.name;
+	entry.contest = req.body.contest;
+	entry.score = req.body.score;
+	entry.timesecs = req.body.timesecs;
 
+  	var entryToSave = new Entry(entry);
+
+	entryToSave.save(function(err) {
+		if (err) {console.log('err:', err);}
+		else {
+			console.log(entryToSave._id);
+			
+			Entry.find({'contest':entry.contest})
+			  .exec(function(err, entries) {
+			  	
+			  	entries.sort(function(a, b) {
+			  		if (a.score > b.score) return -1;
+			  		else if (a.score < b.score) return 1;
+
+			  		if (a.timesecs > b.timesecs) return 1;
+			  		else if (a.timesecs < b.timesecs) return -1;
+			  		else return 0;
+				});
+			  	console.log(entries);
+			  	var place = -1;
+			  	var len = entries.length;
+			  	for (var i=0; i<len; i++) {
+			  		console.log(entries[i]._id, entryToSave._id);
+			  		if (entries[i]._id.toString() === entryToSave._id.toString()) {
+			  			console.log("FOUND");
+			  			place = i;
+			  			break;
+			  		}
+			  	}
+			  	res.json({'place': place+1, 'total':len})
+			});
+		}
+	});
+}
+
+routes.getEntries = function(req, res) {
+	console.log(req.query.contest);
+	Entry.find({'contest':req.query.contest})
+	  .exec(function(err, entries) {
+	  	console.log(entries);
+
+	  	// sort first by score - higher scores come first
+	  	// then by time -less time taken come first
+	  	entries.sort(function(a, b) {
+	  		if (a.score > b.score) return -1;
+	  		else if (a.score < b.score) return 1;
+
+	  		if (a.timesecs > b.timesecs) return 1;
+	  		else if (a.timesecs < b.timesecs) return -1;
+	  		else return 0;
+		});
+	  	if (entries.length < req.query.number) {
+	    	res.json(entries);
+	    } else {
+	    	res.json(entries.slice(0,req.query.number));
+	    }
+	  });
+}
 	
 
 module.exports = routes;
