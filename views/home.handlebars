@@ -27,7 +27,7 @@
 					
 					<input id="numsongs" type="range" class="rangeslider" min="2" max="25" step="1" value="10" data-orientation="vertical">
 				</div>
-				<div id="numsongs-res" class="three columns result">10</div>
+				<div id="numsongs-res" class="two columns result">10</div>
 			</div>
 
 			<div>Audio clip length</div>
@@ -36,7 +36,7 @@
 					
 					<input id="songlen" type="range" class="rangeslider" min="1" max="25" step="1" value="10" data-orientation="vertical">
 				</div>
-				<div id="songlen-res" class="three columns result">10 sec</div>
+				<div id="songlen-res" class="two columns result">10 sec</div>
 			</div>
 
 			<div id="allotted" style="display:none">
@@ -46,7 +46,7 @@
 						
 						<input id="playtime" type="range" class="rangeslider" min="15" max="600" step="15" value="180" data-orientation="vertical">
 					</div>
-					<div id="playtime-res" class="three columns result"></div>
+					<div id="playtime-res" class="two columns result"></div>
 				</div>
 			</div>
 
@@ -75,7 +75,18 @@
 
 			<p>This site allows you to guess what Rise Against song is playing based on a short clip of a random portion of the song.</p>
 
-			<p>A number of settings allow you to mold the game to your preferences and knowledge level.  You can choose how many songs to guess and the duration of each song clip.  In countdown mode, you can choose how long the game lasts for.  For added difficulty, you can choose not to show the album art for each song.</p>
+			<p>A number of settings allow you to mold the game to your preferences and knowledge level.  You can choose how many songs to guess and the duration of each song clip.  In countdown mode, you can choose how long the game lasts for.  For added difficulty, you can choose not to show the album art for each song.  This game requires a decent internet connection in order to load the audio clips.</p>
+
+			<p>Feel free to join a contest to compete against other fans in tournaments.  When you join, you will be prompted to enter a username and then directed to a game with pre-defined configuration.  Get the best score in the fastest time possible to show up on the leaderboard!</p>
+
+			<p style="margin-bottom: 0px;">If you experience technical difficulties:
+				<ul style="margin-top:.25rem;">
+					<li>Reload the page or try again later</li>
+					<li>Ensure that your browser has JavaScript enabled</li>
+					<li>Ensure that your browser is updated to the latest version</li>
+					<li>Send an email to the address below describing the problem</li>
+				</ul>
+			</p>
 
 			<p>This game is free and fan-made, and not affiliated with Rise Against in any way.  With questions, comments, suggestions, bug reports, or concerns, please email the creator at anne[at]loverso[dot]org</p>
 		</div>
@@ -88,6 +99,7 @@
 		<div class="five columns">
 			<button class="button-primary" style="display:inline" onclick="join('extreme')">join</button>
 			<h4 style="display:inline">Extreme Mode</h4>
+			<span class="dropt"><i style="display:inline" class="fa fa-question-circle"></i><span>Attempt to guess 10 songs in 1 minute, with 1-secong-long clips and no album art</span></span>
 			<ul id="extreme">
 				<li class="headerrow">
 					<span class="namespan">User</span>
@@ -99,6 +111,7 @@
 		<div class="five columns">
 			<button class="button-primary" style="display:inline" onclick="join('ordinary')">join</button>
 			<h4 style="display:inline">Ordinary Mode</h4>
+			<span class="dropt"><i style="display:inline" class="fa fa-question-circle"></i><span>Attempt to guess 10 songs in 3 minutes, with 5-secong-long clips</span></span>
 			<ul id="ordinary">
 				<li class="headerrow">
 					<span class="namespan">User</span>
@@ -157,7 +170,7 @@
 
 				<div class="row">
 					<div class="wrap">
-						<form class="guessform" onSubmit="submitGuess()">
+						<form class="guessform" onSubmit="submitGuess(event)">
 							<input id="guess" type="text" placeholder="What's the Song?"></input>
 							<input id="submitbutton" class="button button-primary" type="submit" value="Submit"></input>
 						</form>

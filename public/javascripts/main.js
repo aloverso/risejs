@@ -90,16 +90,18 @@ function Container() {
 
 	function onGotSongs(num) {
 		for (var i=0; i<num; i++) {
+			var s = songs[i];
 			var audioElement = document.createElement('audio');
-			audioElement.setAttribute('src', songs[i].path);
-			audioElement.currentTime = songs[i].startTime;
+			audioElement.setAttribute('src', s.path);
+			console.log(s.startTime);
+			audioElement.currentTime = s.startTime;
 			audioElement.load();
-			audioElement.setAttribute('id',songs[i].title)
+			audioElement.setAttribute('id',s.title)
 			audioElement.preload = "auto";
 			audioElement.added = false;
 			audioElement.oncanplaythrough = function() {
-				console.log("asfdasdf");
-				console.log(canplay.indexOf(this));
+				// console.log("asfdasdf");
+				// console.log(canplay.indexOf(this));
 				//console.log(this.added);
 				//console.log(gameEnded());
 				//console.log(this);
@@ -311,6 +313,7 @@ function Container() {
 				}
 
 				if (timesecs < 0) {
+					timesecs = 0;
 					revealanswers();
 				} else {
 					$('#timer').html("Time: "+formatSecString(timesecs));
@@ -319,6 +322,9 @@ function Container() {
 				timesecs += 1;
 				$('#timer').html("Time: "+formatSecString(timesecs));
 			}
+
+			console.log(canplay[counter].currentTime);
+			console.log(canplay[counter].paused);
 
 		}, 1000);
 	}
@@ -349,7 +355,7 @@ function Container() {
 				'score': score,
 				'timesecs': CONFIG.playtime - timesecs 
 			}).success(function(data) {
-				console.log(data);
+				// console.log(data);
 				notsaved = false;
 				$('#contest-message').html(makeContestMessage(data.place, data.total));
 			});
@@ -475,6 +481,9 @@ function Container() {
 			case "strength to go on":
 				return "the strength to go on";
 				break;
+			case "anyway you want it":
+				return "any way you want it";
+				break;
 			default:
 				return stripped;
 		}
@@ -499,6 +508,7 @@ function Container() {
 				nextsong();
 			}
 		}
+		return false;
 	}
 }
 
@@ -520,7 +530,7 @@ function GAME() {
 	var $guessForm = $('form.guessform').unbind();
 }
 
-function submitGuess() {
+function submitGuess(event) {
 	event.preventDefault();
 	var guess = $('#guess').val();
 	$('#guess').val('');
@@ -650,7 +660,7 @@ function SETUP() {
     $('input[type="range"]').rangeslider();
 
 	$('input').on('input', function () {
-		console.log("WKASLFD");
+		// console.log("WKASLFD");
 		CONFIG[$(this).attr('id')] = parseInt($(this).val());
 		
 		if($(this).attr('id') === 'playtime') {
@@ -668,7 +678,7 @@ function SETUP() {
 function populateContest(id) {
 	$.get("/getEntries", {'contest': id, 'number': 10})
   	.done(function(data) {
-  		console.log(data);
+  		// console.log(data);
   		$list = $('#'+id);
   		for (var i=0; i<10; i++) {
   			if(data[i])	$list.append(makeEntry(data[i].name, data[i].timesecs, data[i].score));

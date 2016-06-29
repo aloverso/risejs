@@ -61,9 +61,22 @@
     width: 19%;
 }
 
-li {
-    list-style: none;
+ul {
+    line-height: auto;
 }
+
+ul#extreme, ul#ordinary {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 0; 
+}
+
+span.dropt {border-bottom: thin dotted;}
+span.dropt:hover {text-decoration: none; background: #eeeeee; z-index: 6; }
+span.dropt span {position: absolute; left: -9999px;
+  margin: 4px 0 0 0px; padding: 3px 3px 3px 3px; 
+  border-style:solid; border-color:#bbb; border-width:.5px; width: 500px; border-radius: 5px;}
+span.dropt:hover span {left:10%; margin: 20px 0 0 170px; background: #ffffff; z-index:6;}
 
 .onoffswitch {
     position: relative; width: 90px;
