@@ -446,14 +446,8 @@ function Container() {
 		SETUP();
 	}
 
-	function formatSecString(secs) {
-	    var mins = Math.floor(secs/60);
-	    var se = Math.floor(secs % 60);
-	    return mins+"m"+se+"s";
-	}
-
 	function strip(s) {
-		return s.toLowerCase().replace(/['.,\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+		return s.toLowerCase().replace(/['.,\/#!$%\^&\*;:{}=_`~()]/g,"").replace(/\-/g," ");
 	}
 
 	function amendguess(stripped) {
@@ -461,7 +455,8 @@ function Container() {
 			case "re education through labor":
 			case "reeducation":
 			case "re education":
-				return "reeducation through labor";
+			case "reeducation through labor":
+				return "re education through labor";
 				break;
 			case "make it stop":
 			case "septembers children":
@@ -477,6 +472,9 @@ function Container() {
 			case "ghost of tom joad":
 				return "the ghost of tom joad";
 				break;	
+			case "strength to go on":
+				return "the strength to go on";
+				break;
 			default:
 				return stripped;
 		}
@@ -534,6 +532,9 @@ function submitGuess() {
 function formatSecString(secs) {
 	    var mins = Math.floor(secs/60);
 	    var se = Math.floor(secs % 60);
+	    if (mins===0) {
+	    	return se+"s"
+	    }
 	    return mins+"m"+se+"s";
 	}
 
@@ -678,7 +679,7 @@ function populateContest(id) {
 function makeEntry(name, time, score) {
 	return '<li class="entry">' 
 	    + '<span class="namespan">' + name + '</span>'
-		+ '<span class="timespan">' + time + '</span>'
+		+ '<span class="timespan">' + formatSecString(time) + '</span>'
 		+ '<span class="scorespan">' + score + '</span>'
 		+ '</li>';
 }
