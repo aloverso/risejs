@@ -10,11 +10,11 @@
 }
 
 img#albumart {
-	max-width:100%;
+	max-width:95%;
 	max-height:100%;
-	align-self: center;
 	border-radius: 8px;
 	border: 5px solid #333;
+	overflow: auto;
 }
 
 .clickable {
@@ -39,10 +39,14 @@ img#albumart {
 
 
 .wrap {
-	display: flex;
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	display: flex; 
   	justify-content: center;
-  	align-items: flex-end;
-  	padding: 0.25em;
+  	align-items: center;
+  	
+  	text-align: center;
 }
 
 .changer {

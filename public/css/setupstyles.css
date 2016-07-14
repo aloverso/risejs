@@ -65,6 +65,18 @@ ul {
     line-height: auto;
 }
 
+#timelimit {
+    margin: 0px;
+    border-width: 1px 0px 1px 1px;
+    border-radius: 10px 0px 0px 10px;
+}
+
+#infinitetime {
+    margin: 0px;
+    border-width: 1px 1px 1px 0px;
+    border-radius: 0px 10px 10px 0px;
+}
+
 ul#extreme, ul#ordinary {
     list-style: none;
     padding-left: 0;

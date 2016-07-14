@@ -17,8 +17,7 @@
 
 			<div class="row">
 				<div class="twelve columns">
-					<button id='fixedtime' onclick="fixedtime()">Time Limit</button>
-					<button id='fixednum' class="active" onclick="fixednum()">Infinite Time</button>
+					<button id='timelimit' class="active" onclick="timelimit()">Time Limit</button><button id='infinitetime' onclick="infinitetime()">Infinite Time</button>
 				</div>
 			</div>
 			<div>Number of Songs to Guess</div>
@@ -145,27 +144,31 @@
 
 			<div id="interaction-unit">
 				<div class="row">
-					<div class="one-third column">
-						<div class="wrap changer">
+
+					<div class="four columns offset-by-four">
+						<div class="wrap">
+							<div><img id="albumart" src=""></div>
+						</div>
+					</div>
+
+				</div>
+				<div class="row">
+					<div class="two columns offset-by-three">
+						<div class="wrap">
 							<i class="fa fa-step-backward fa-4x clickable" onclick="c.backsong()"></i>
 						</div>
 					</div>
-					<div class="one-third column">
+					<div class="two columns">
 						<div class="wrap">
-							<div><img id="albumart" src=""></div>
-							<div id="spinn"></div>
+							<i id="playpauser" class="fa fa-pause-circle-o fa-5x clickable" onclick="c.playpause()"></i>
 						</div>
 					</div>
-					<div class="one-third column">
-						<div class="wrap changer">
+					<div class="two columns">
+						<div class="wrap">
 							<i class="fa fa-step-forward fa-4x clickable" onclick="c.nextsong()"></i>
 						</div>
 					</div>
-				</div>
-				<div class="row">
-					<div class="wrap">
-						<i id="playpauser" class="fa fa-pause-circle-o fa-5x clickable" onclick="c.playpause()"></i>
-					</div>
+					<div class="two columns"></div>
 				</div>
 
 				<div class="row">
