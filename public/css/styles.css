@@ -69,6 +69,7 @@ img#albumart {
 	float: right;
 	font-size: 18px;
 	vertical-align: middle;
+	width: 100%
 }
 
 .lefticon {

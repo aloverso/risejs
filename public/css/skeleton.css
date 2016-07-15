@@ -152,7 +152,8 @@ h6 { font-size: 1.5rem; line-height: 1.6;  letter-spacing: 0; }
 }
 
 p {
-  margin-top: 0; }
+  margin-top: 0; 
+}
 
 
 /* Links
@@ -352,12 +353,15 @@ blockquote,
 dl,
 figure,
 table,
-p,
 ul,
 ol,
 form {
   margin-bottom: 2.5rem; }
 
+
+p {
+  margin-bottom: 1.5rem;
+}
 
 /* Utilities
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
