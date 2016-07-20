@@ -39,6 +39,8 @@ function Container() {
 	var ended = false;
 	var notsaved = true;
 
+	var prevtime;
+
 	var timerint;
 	var songcheckint;
 
@@ -47,6 +49,7 @@ function Container() {
 
 	var canplay = []; // contains loaded audio elements
 	var songsplay = []; // contains loaded song objects
+	var extrasongs = []; // extra loaded audio elements
 	var guesses = -1;
 
 	this.setgame = setgame;
@@ -59,6 +62,7 @@ function Container() {
 	this.giveup = giveup
 	this.settime = settime;
 	this.STARTLOADING = STARTLOADING;
+	this.canplay = canplay
 
 	function settime(time) {
 		timesecs = time;
@@ -72,9 +76,9 @@ function Container() {
 		revealanswers();
 	}
 
-	function updateSongList(song) {
-		songs.push(song);
-	}
+	// function updateSongList(song) {
+	// 	songs.push(song);
+	// }
 
 	function STARTLOADING(num) {
 		GETNSONGS(num);
@@ -90,17 +94,25 @@ function Container() {
 			audioElement.setAttribute('id',s.title)
 			audioElement.preload = "auto";
 			audioElement.added = false;
-			audioElement.oncanplaythrough = function() {
-				if (canplay.indexOf(this) < 0 && !this.added && !gameEnded()) {
-					canplay.push(this);
-					t = this.getAttribute('id');
 
-					for (var j=0; j<num; j++) {
-						if (songs[j].title === t) {
-							songsplay.push(songs[j]);
-							console.log("load");
-							this.added = true;
-							break;
+			audioElement.oncanplaythrough = function() {
+				// console.log(this.readyState);
+				// console.log("getting called");
+				if (canplay.indexOf(this) < 0 && !this.added && !gameEnded()) {
+					// add a song to extras just in case
+					if (canplay.length > 0 && extrasongs.length === 0) {
+						extrasongs.push(this);
+					} else {
+						canplay.push(this);
+						t = this.getAttribute('id');
+
+						for (var j=0; j<num; j++) {
+							if (songs[j].title === t) {
+								songsplay.push(songs[j]);
+								console.log("load");
+								this.added = true;
+								break;
+							}
 						}
 					}
 					
@@ -122,6 +134,13 @@ function Container() {
 	}
 
 	function setgame() {
+
+		document.addEventListener('play', function(e){
+		    var audios = document.getElementsByTagName('audio');
+		    for(var i = 0, len = audios.length; i < len;i++){
+		        console.log(audios[i]);
+		    }
+		}, true);
 		// reset elements
 		$('#giveup-button').css('display', 'inline');
 		$('#interaction-unit').css('display', 'block');
@@ -131,7 +150,7 @@ function Container() {
 		$('#playpauser').attr('class', 'fa fa-pause-circle-o fa-5x clickable');
 
 		// only use required songs
-		canplay.splice(CONFIG.numsongs, 25);
+		extrasongs = canplay.splice(CONFIG.numsongs, 25);
 
 		// append any ready-to-play songs
 		for (var i=0; i<canplay.length; i++) {
@@ -146,20 +165,23 @@ function Container() {
 
 		// create 200ms interval to check for song reset time (and other functions)
 		songcheckint = setInterval(function() {
-			if (currentSong) {
+			// console.log(currentSong, canplay[counter]);
+			if (currentSong != undefined && canplay[counter] != undefined) {
 				if (canplay[counter].currentTime >= currentSong.startTime + parseInt(CONFIG.songlen)) {
 					canplay[counter].currentTime = currentSong.startTime;
 				}
 			}
 
 			// as more songs load keep splicing
-			canplay.splice(CONFIG.numsongs, 25);
+			extrasongs = extrasongs.concat(canplay.splice(CONFIG.numsongs, 25));
+			// console.log(extrasongs.length);
 
 			// add any more songs that have loaded to the statusholder
 			if (canplay.length > $('#statusholder').children().length) {
 				for (var i=($('#statusholder').children().length); i<canplay.length; i++) {
 
 					var t = canplay[i].getAttribute('id');
+					// console.log(t);
 					$('#loading').remove();
 					$('#statusholder').append("<div class='status-box clickable' id='"+t.hashCode()+"' onclick='c.jumpsong("+i+")'>"+(i+1)+"</div>");
 					
@@ -213,6 +235,42 @@ function Container() {
 			}
 			// console.log(canplay[counter].currentTime);
 			// console.log(canplay[counter].paused);
+
+			// check for failed songs
+			if (canplay[counter].currentTime === prevtime && !canplay[counter].paused) {
+				console.log("nooooooooo");
+				console.log(canplay[counter].readyState);
+
+				// get rid of song, pull one from extras
+				var orig_t = canplay[counter].getAttribute('id');
+				canplay[counter].pause();
+
+				var replacement_song = extrasongs.pop();
+				canplay[counter] = replacement_song;
+
+				var t = replacement_song.getAttribute('id');
+				for (var j=0; j<songs.length; j++) {
+					if (songs[j].title === t) {
+						songsplay[counter] = songs[j];
+						currentSong = songsplay[counter];
+						// console.log(currentSong);
+						canplay[counter].play();
+						console.log("RELOADED");
+
+						// fix status id
+						$('#'+orig_t.hashCode()).attr('id',t.hashCode());
+						if (CONFIG.albumart) {
+							$('#albumart').attr('src', 'images/'+currentSong.album+'.jpg');
+						}
+
+						replacement_song.added = true;
+						break;
+					}
+				}
+				// console.log(currentSong);
+			}
+
+			prevtime = canplay[counter].currentTime;
 
 		}, 1000);
 	}

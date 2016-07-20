@@ -126,13 +126,11 @@ routes.saveEntry = function(req, res) {
 			  		else if (a.timesecs < b.timesecs) return -1;
 			  		else return 0;
 				});
-			  	console.log(entries);
 			  	var place = -1;
 			  	var len = entries.length;
 			  	for (var i=0; i<len; i++) {
 			  		console.log(entries[i]._id, entryToSave._id);
 			  		if (entries[i]._id.toString() === entryToSave._id.toString()) {
-			  			console.log("FOUND");
 			  			place = i;
 			  			break;
 			  		}
@@ -151,12 +149,17 @@ routes.getEntries = function(req, res) {
 
 	  	// sort first by score - higher scores come first
 	  	// then by time -less time taken come first
+	  	// then by date - newer entries first for more churn
 	  	entries.sort(function(a, b) {
 	  		if (a.score > b.score) return -1;
 	  		else if (a.score < b.score) return 1;
 
 	  		if (a.timesecs > b.timesecs) return 1;
 	  		else if (a.timesecs < b.timesecs) return -1;
+	  		
+	  		// with ids, greater is newer
+	  		if (a._id > b._id) return -1;
+	  		else if (a._id < b._id) return 1;
 	  		else return 0;
 		});
 	  	if (entries.length < req.query.number) {
