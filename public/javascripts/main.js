@@ -509,7 +509,7 @@ function startgame() {
 function setSlidersToConfigs() {
 	$('#numsongs-res').text(CONFIG.numsongs);
 	$('#numsongs').val(CONFIG.numsongs);
-	$('#songlen-res').text(CONFIG.songlen);
+	$('#songlen-res').text(CONFIG.songlen + ' sec');
 	$('#songlen').val(CONFIG.songlen);
 	$('#playtime-res').text(CONFIG.playtime);
 	$('#playtime').val(CONFIG.playtime);
@@ -517,7 +517,9 @@ function setSlidersToConfigs() {
 }
 
 function reset() {
-	CONFIG = defaultconfig;
+	for (var attr in defaultconfig) {
+		CONFIG[attr] = defaultconfig[attr];
+	}
 	setSlidersToConfigs();
 
 	savedPlaytime = CONFIG.playtime;
