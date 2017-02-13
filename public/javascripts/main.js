@@ -587,11 +587,17 @@ function populateContest(id) {
 }
 
 function makeEntry(name, time, score) {
-	return '<li class="entry">' 
-	    + '<span class="namespan">' + name + '</span>'
-		+ '<span class="timespan">' + formatSecString(time) + '</span>'
-		+ '<span class="scorespan">' + score + '</span>'
-		+ '</li>';
+	return $('<li></li>')
+	.addClass('entry')
+    .append($('<span></span>')
+        .addClass('namespan')
+        .text(name))
+    .append($('<span></span>')
+        .addClass('timespan')
+        .text(time))
+    .append($('<span></span>')
+        .addClass('scorespan')
+        .text(score));
 }
 
 function join(contest) {

@@ -34,7 +34,7 @@ routes.getnewsong = function(req,res) {
 	var songslist = allsongs.songs;
 	var randi = Math.floor(songslist.length * Math.random());
 	var randsong = songslist[randi];
-	// console.log(randsong);
+	//console.log(randsong);
 	res.json({
 	  	'title':randsong.title,
 	  	'album':randsong.album,
@@ -58,7 +58,7 @@ routes.getnsongs = function(req,res) {
 		var index = 1;
 		var randsong;
 		while (index >= 0) {
-			console.log(index);
+			//console.log(index);
 			var randi = Math.floor(songslist.length * Math.random());
 			randsong = makeJson(songslist[randi]);
 			index = songtitles.indexOf(randsong.title);
@@ -66,7 +66,7 @@ routes.getnsongs = function(req,res) {
 		// console.log(index);
 		finalsongs.push(randsong);
 		songtitles.push(randsong.title);
-		// console.log(finalsongs);
+		//console.log(finalsongs);
 	}
 
 	function makeJson(randsong) {
@@ -80,6 +80,7 @@ routes.getnsongs = function(req,res) {
 		  };
 	}
 
+	console.log(finalsongs);
 	res.json(finalsongs);
 }
 
@@ -113,7 +114,7 @@ routes.saveEntry = function(req, res) {
 	entryToSave.save(function(err) {
 		if (err) {console.log('err:', err);}
 		else {
-			console.log(entryToSave._id);
+			//console.log(entryToSave._id);
 			
 			Entry.find({'contest':entry.contest})
 			  .exec(function(err, entries) {
@@ -129,7 +130,7 @@ routes.saveEntry = function(req, res) {
 			  	var place = -1;
 			  	var len = entries.length;
 			  	for (var i=0; i<len; i++) {
-			  		console.log(entries[i]._id, entryToSave._id);
+			  		//console.log(entries[i]._id, entryToSave._id);
 			  		if (entries[i]._id.toString() === entryToSave._id.toString()) {
 			  			place = i;
 			  			break;
@@ -142,10 +143,10 @@ routes.saveEntry = function(req, res) {
 }
 
 routes.getEntries = function(req, res) {
-	console.log(req.query.contest);
+	//console.log(req.query.contest);
 	Entry.find({'contest':req.query.contest})
 	  .exec(function(err, entries) {
-	  	console.log(entries);
+	  	//console.log(entries);
 
 	  	// sort first by score - higher scores come first
 	  	// then by time -less time taken come first
